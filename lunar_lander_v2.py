@@ -2,9 +2,13 @@ import gymnasium as gym
 import torch
 from simple_ne.simple_ne import SimpleNEPopulation, SimpleNEAgent
 from simple_ne.preset_params import get_named_params
+import pickle
 
-def play_game(net : SimpleNEAgent):
-    env = gym.make("LunarLander-v2")
+def play_game(net : SimpleNEAgent, render=False):
+    if render:
+        env = gym.make("LunarLander-v2", render_mode="human")
+    else:
+        env = gym.make("LunarLander-v2")
     obs,_ = env.reset()
     done = False
     rs = 0
@@ -22,8 +26,7 @@ def play_game(net : SimpleNEAgent):
 def eval_pop(population):
     fitness_list = []
     for net_idx in range(len(population)):
-        reward = play_game(population[net_idx])
-        fitness_list.append(reward)
+        fitness_list.append(play_game(population[net_idx]))
     return torch.tensor(fitness_list, dtype=torch.float32)
 
 if __name__ == '__main__':
@@ -44,3 +47,9 @@ if __name__ == '__main__':
         epoch_counter += 1
         pop.evolve(fits)
     print(f"solved in {epoch_counter} generations")
+    solved_net = pop.population[torch.argmax(fits).item()]
+    for x in range(5):
+        print(play_game(solved_net, True))
+    pickle.dump(solved_net,  open('./saved_models/lunar-lander-solver.pkl', 'wb'))
+    solved_net.print_model_details()
+

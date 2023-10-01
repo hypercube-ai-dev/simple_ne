@@ -1,4 +1,5 @@
 import torch
+import torch.functional as F
 import math
 
 def scaled_dot_product(q, k, v, mask=None):

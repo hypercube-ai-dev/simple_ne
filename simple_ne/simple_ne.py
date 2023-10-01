@@ -20,30 +20,46 @@ class SimpleNENode(object):
         return self.activation(torch.matmul(self.weights, inputs))
 
 class SimpleNEAgent(nn.Module):
-    def __init__(self, nodes: list[SimpleNENode], input_size, output_size):
+    def __init__(self, nodes: list[SimpleNENode], input_size, output_size, batch_size = 0):
         super().__init__()
         self.nodes = nodes
         self.in_size = input_size
         self.out_size = output_size
+        self.batch_size = batch_size
         self.reset()
         return
 
     def reset(self):
         # this is to track the value at each node
-        self.activs = torch.zeros(self.in_size + len(self.nodes)+1)
-
+        if self.batch_size == 0:
+            self.activs = torch.zeros(self.in_size + len(self.nodes)+1)
+        else:
+            self.activs = torch.zeros(self.batch_size, self.in_size + len(self.nodes)+1)
     # nodes are added in order and have a
     # probability of connecting to existing nodes
     # each node will need the output of nodes that come before it
     def forward(self, x, mask=None):
-        self.activs[:x.shape[0]] = x
-        out = []
-        for ix,n in enumerate(self.nodes):
-            n_out = n.activate(self.activs)
-            self.activs[x.shape[0]+ix] = n_out
-            if n.is_output == True:
-                out.append(n_out)
+        if self.batch_size == 0:
+            self.activs[:x.shape[0]] = x
+            out = []
+            for ix,n in enumerate(self.nodes):
+                n_out = n.activate(self.activs)
+                self.activs[x.shape[0]+ix] = n_out
+                if n.is_output == True:
+                    out.append(n_out)
+        else:
+            self.activs[:,:x.shape[0]] = x
+            out = []
+            for ix,n in enumerate(self.nodes):
+                n_out = n.activate(self.activs, batched=True)
+                self.activs[:,x.shape[0]+ix] = n_out
+                if n.is_output == True:
+                    out.append(n_out)
         return torch.tensor(out)
+    
+    def print_model_details(self):
+        num_cons = sum(len(n.in_idxs) for n in self.nodes)
+        print(f"{len(self.nodes)} total nodes \n {num_cons} total connections")
 
 class SimpleNEPopulation():
     def __init__(
@@ -106,7 +122,8 @@ class SimpleNEPopulation():
         if add_node:
             activation_key = torch.argmax(torch.rand(len(activations)))
             connection_keys = self.get_connection_keys(1)
-            connection_keys = torch.tensor([torch.argmax(torch.rand(self.in_size + self.out_size + len(nodes)-2))])
+            if len(connection_keys.size()) == 0:
+                connection_keys = torch.tensor([torch.argmax(torch.rand(self.in_size + self.out_size + len(nodes)-2))])
             weights = torch.randn(len(connection_keys))
             key = len(nodes)
             nodes.append(SimpleNENode(

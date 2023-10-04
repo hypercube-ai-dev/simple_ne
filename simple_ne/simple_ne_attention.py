@@ -25,7 +25,11 @@ class AttentionNeNode(torch.nn.Module):
         self.is_output = is_output
 
     def forward(self, inputs):
-        return
+        qkv_proj = torch.matmul(inputs, self.weights)
+        q,k,v = qkv_proj.chunk(3, dim=-1)
+        values,_ = scaled_dot_product(q,k,v)
+        out = torch.matmul(values[-1:,], self.o_proj)
+        return out
 
 class AttentionNeNet(torch.nn.Module):
 
@@ -62,7 +66,7 @@ class AttentionNeNet(torch.nn.Module):
             self.activs[-1:,x.shape[0]+ix] = n_out
             if n.is_output == True:
                 out.append(n_out)
-        return
+        return out
     
     def activate_batched(self, inputs):
         return

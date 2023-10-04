@@ -5,9 +5,9 @@ from .activations import activations
 
 
 class SimpleNENode(object):
-    def __init__(self, activation, weights, in_idxs, key, is_output=False):
+    def __init__(self, activation, in_idxs, key, is_output=False):
         self.activation = activation
-        self.weights = weights
+        self.weights = torch.randn(len(in_idxs))
         self.in_idxs = in_idxs
         self.node_key = key
         self.is_output = is_output
@@ -48,16 +48,18 @@ class SimpleNEAgent(nn.Module):
                 if n.is_output == True:
                     out.append(n_out)
         else:
-            self.activs[:,:x.shape[0]] = x
+            self.activs[:,:x.shape[1]] = x
             out = []
             for ix,n in enumerate(self.nodes):
                 n_out = n.activate(self.activs, batched=True)
-                self.activs[:,x.shape[0]+ix] = n_out
+                self.activs[:,x.shape[1]+ix] = n_out
                 if n.is_output == True:
                     out.append(n_out)
         return torch.tensor(out)
     
     def print_model_details(self):
+        for node in self.nodes:
+            print(f"node key {node.node_key}, connections to {node.in_idxs}")
         num_cons = sum(len(n.in_idxs) for n in self.nodes)
         print(f"{len(self.nodes)} total nodes \n {num_cons} total connections")
 
@@ -70,7 +72,8 @@ class SimpleNEPopulation():
             pop_size, 
             species=1, 
             output_activation = None,
-            prob_params = None):
+            prob_params = None,
+            in_layer=True):
         self.max_nodes = max_size
         self.pop_size = pop_size
         self.in_size = input_size
@@ -108,27 +111,24 @@ class SimpleNEPopulation():
             weights = torch.rand(len(connection_keys))
         '''
         add_node = random() < self.prob_params[1]
-        for x in range(self.in_size):
-            activation_key = torch.argmax(torch.rand(len(activations)))
-            connection_keys = torch.tensor([x])
-            weights = torch.randn(len(connection_keys))
-            key = self.in_size + x
-            nodes.append(SimpleNENode(
-                activations[activation_key],
-                weights,
-                connection_keys,
-                key
-            ))
+        if self.in_layer:
+            for x in range(self.in_size):
+                activation_key = torch.argmax(torch.rand(len(activations)))
+                connection_keys = torch.tensor([x])
+                key = self.in_size + x
+                nodes.append(SimpleNENode(
+                    activations[activation_key],
+                    connection_keys,
+                    key
+                ))
         if add_node:
             activation_key = torch.argmax(torch.rand(len(activations)))
             connection_keys = self.get_connection_keys(1)
             if len(connection_keys.size()) == 0:
                 connection_keys = torch.tensor([torch.argmax(torch.rand(self.in_size + self.out_size + len(nodes)-2))])
-            weights = torch.randn(len(connection_keys))
             key = len(nodes)
             nodes.append(SimpleNENode(
                 activations[activation_key],
-                weights,
                 connection_keys,
                 key
             ))
@@ -140,11 +140,9 @@ class SimpleNEPopulation():
             connection_keys = self.get_connection_keys(len(nodes))
             if len(connection_keys.size()) == 0:
                 connection_keys = torch.tensor([torch.argmax(torch.rand(self.in_size + self.out_size + len(nodes)-2))])
-            weights = torch.randn(len(connection_keys))
             key = self.in_size + len(nodes) + i
             nodes.append(SimpleNENode(
                 activations[activation_key],
-                weights,
                 connection_keys,
                 key,
                 True
@@ -186,6 +184,8 @@ class SimpleNEPopulation():
         else:
             return None
 
+    def cross_over(self, net_one, net_two):
+        return
     
     def get_connection_keys(self, num_nodes):
         # all nodes should have the ability to connect with any other node

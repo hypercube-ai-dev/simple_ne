@@ -57,6 +57,8 @@ class AttentionNeNet(torch.nn.Module):
         if self.no_actives == False:
             new_activs = torch.zeros(1,self.actives.shape[1])
             new_activs[:,:x.shape[0]] = x
+            if self.activs.shape[0] == self.max_context_length:
+                self.activs = self.activs[1:,]
             self.activs = torch.cat((self.actives, new_activs), dim=0)
         else:
             self.actives[:,:x.shape[0]] = x

@@ -3,7 +3,6 @@ from torch import nn
 from random import random
 from .activations import activations
 
-
 class SimpleNENode(object):
     def __init__(self, activation, in_idxs, key, is_output=False):
         self.activation = activation
@@ -57,6 +56,24 @@ class SimpleNEAgent(nn.Module):
                     out.append(n_out)
         return torch.tensor(out)
     
+    def get_weights(self, flattened=False):
+        if not flattened:
+            return self.get_weights_as_dict()
+        else:
+            return self.get_weights_flattened()
+
+    def get_weights_flattened(self):
+        weights_list = torch.tensor()
+        for n in self.nodes:
+            weights_list += n.weights
+        return weights_list
+        
+    def get_weights_as_dict(self):
+        weight_dict = {}
+        for n in self.nodes:
+            weight_dict[n.node_key] = n.weights
+        return weight_dict
+
     def print_model_details(self):
         for node in self.nodes:
             print(f"node key {node.node_key}, connections to {node.in_idxs}")

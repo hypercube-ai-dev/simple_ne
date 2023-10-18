@@ -2,7 +2,7 @@ import torch
 from torch import nn
 from random import random
 from .activations import activations
-
+from .preset_params import get_named_params
 
 class SimpleNENode(object):
     def __init__(self, activation, in_idxs, key, is_output=False):
@@ -57,6 +57,24 @@ class SimpleNEAgent(nn.Module):
                     out.append(n_out)
         return torch.tensor(out)
     
+    def get_weights(self, flattened=False):
+        if not flattened:
+            return self.get_weights_as_dict()
+        else:
+            return self.get_weights_flattened()
+
+    def get_weights_flattened(self):
+        weights_flat = torch.empty((0))
+        for n in self.nodes:
+            weights_flat = torch.cat((weights_flat, n.weights), 0)
+        return weights_flat
+        
+    def get_weights_as_dict(self):
+        weight_dict = {}
+        for n in self.nodes:
+            weight_dict[n.node_key] = n.weights
+        return weight_dict
+
     def print_model_details(self):
         for node in self.nodes:
             print(f"node key {node.node_key}, connections to {node.in_idxs}")
@@ -80,6 +98,7 @@ class SimpleNEPopulation():
         self.out_size = ouput_size
         self.output_activation = output_activation
         self.population = []
+        self.in_layer = in_layer
         '''
         0 -> elitism (0,1)
         1 -> add node prob (0,1)
@@ -90,7 +109,7 @@ class SimpleNEPopulation():
             self.prob_params = prob_params
         else:
             if species == 1:
-                self.prob_params = torch.rand(4)
+                self.prob_params = get_named_params("bernolli", 4)
             else:
                 self.prob_params = torch.rand(species, 4)
         self.elite_cutoff = int(self.pop_size * self.prob_params[0])

@@ -20,7 +20,7 @@ class SimpleNENode(object):
         return self.activation(torch.matmul(self.weights, inputs))
 
 class SimpleNEAgent(nn.Module):
-    def __init__(self, nodes: list[SimpleNENode], input_size, output_size, batch_size = 0):
+    def __init__(self, nodes, input_size, output_size, batch_size = 0):
         super().__init__()
         self.nodes = nodes
         self.in_size = input_size

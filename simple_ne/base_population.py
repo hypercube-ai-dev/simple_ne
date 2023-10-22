@@ -21,6 +21,7 @@ class SimpleNEPopulation():
         self.out_size = ouput_size
         self.output_activation = output_activation
         self.population = []
+        self.in_layer = in_layer
         '''
         0 -> elitism (0,1)
         1 -> add node prob (0,1)

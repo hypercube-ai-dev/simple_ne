@@ -112,9 +112,9 @@ class SimpleNEPopulation():
             key = len(net_nodes)
             net_nodes.append(SimpleNENode(
                 activations[activation_key],
-                weights,
                 connection_keys,
-                key
+                key,
+                weights
             ))
             add_conns_from_node = (torch.rand(len(net_nodes) - 1) < self.prob_params[3]).nonzero()
             for i in add_conns_from_node:
@@ -146,3 +146,10 @@ class SimpleNEPopulation():
                     self.population.append(mutated)
         for i in range (self.pop_size - len(self.population)):
             self.population.append(self.create_genome())
+
+    def create_node(self, activation_ix, connections, node_key, weights=None):
+        return SimpleNENode(
+            activations[activation_ix],
+            connections,
+            node_key,
+            weights=weights)

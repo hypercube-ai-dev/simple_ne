@@ -4,9 +4,12 @@ from random import random
 from .activations import activations
 
 class SimpleNENode(object):
-    def __init__(self, activation, in_idxs, key, is_output=False):
+    def __init__(self, activation, in_idxs, key, weights=None, is_output=False):
         self.activation = activation
-        self.weights = torch.randn(len(in_idxs))
+        if weights == None:
+            self.weights = torch.randn(len(in_idxs))
+        else:
+            self.weights = weights
         self.in_idxs = in_idxs
         self.node_key = key
         self.is_output = is_output

@@ -57,6 +57,7 @@ class SimpleNEAgent(nn.Module):
                 self.activs[:,x.shape[1]+ix] = n_out
                 if n.is_output == True:
                     out.append(n_out)
+        print(self.activs)
         return torch.tensor(out)
     
     def get_weights(self, flattened=False):

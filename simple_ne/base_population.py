@@ -58,8 +58,8 @@ class SimpleNEPopulation():
                 activation_key = torch.argmax(torch.rand(len(activations)))
                 connection_keys = torch.tensor([x])
                 key = self.in_size + x
-                nodes.append(SimpleNENode(
-                    activations[activation_key],
+                nodes.append(self.create_node(
+                    activation_key,
                     connection_keys,
                     key
                 ))
@@ -69,8 +69,8 @@ class SimpleNEPopulation():
             if len(connection_keys.size()) == 0:
                 connection_keys = torch.tensor([torch.argmax(torch.rand(self.in_size + self.out_size + len(nodes)-2))])
             key = len(nodes)
-            nodes.append(SimpleNENode(
-                activations[activation_key],
+            nodes.append(self.create_node(
+                activation_key,
                 connection_keys,
                 key
             ))
@@ -83,13 +83,14 @@ class SimpleNEPopulation():
             if len(connection_keys.size()) == 0:
                 connection_keys = torch.tensor([torch.argmax(torch.rand(self.in_size + self.out_size + len(nodes)-2))])
             key = self.in_size + len(nodes) + i
-            nodes.append(SimpleNENode(
-                activations[activation_key],
+            print("adding output node")
+            nodes.append(self.create_node(
+                activation_key,
                 connection_keys,
                 key,
-                True
+                is_output=True
             ))
-        return SimpleNEAgent(nodes, self.in_size, self.out_size)
+        return self.create_net(nodes, self.in_size, self.out_size)
     
     def mutate_genome(self, net: SimpleNEAgent):
         mutated = False
@@ -110,11 +111,11 @@ class SimpleNEPopulation():
                 connection_keys = torch.tensor([torch.argmax(torch.rand(self.in_size + self.out_size + len(net_nodes)-2))])
             weights = torch.randn(len(connection_keys))
             key = len(net_nodes)
-            net_nodes.append(SimpleNENode(
-                activations[activation_key],
+            net_nodes.append(self.create_node(
+                activation_key,
                 connection_keys,
                 key,
-                weights
+                weights=weights
             ))
             add_conns_from_node = (torch.rand(len(net_nodes) - 1) < self.prob_params[3]).nonzero()
             for i in add_conns_from_node:
@@ -122,7 +123,7 @@ class SimpleNEPopulation():
                 torch.cat((to_node.in_idxs, torch.tensor([key])))
                 torch.cat((to_node.weights, torch.randn(1)))
         if mutated == True:
-            return SimpleNEAgent(net_nodes, self.in_size, self.out_size)
+            return self.create_net(net_nodes, self.in_size, self.out_size)
         else:
             return None
 
@@ -147,9 +148,12 @@ class SimpleNEPopulation():
         for i in range (self.pop_size - len(self.population)):
             self.population.append(self.create_genome())
 
-    def create_node(self, activation_ix, connections, node_key, weights=None):
+    def create_node(self, activation_ix, connections, node_key, weights=None, is_output=False):
         return SimpleNENode(
             activations[activation_ix],
             connections,
             node_key,
             weights=weights)
+    
+    def create_net(self, nodes, in_size, out_size):
+        return SimpleNEAgent(nodes, in_size, out_size)

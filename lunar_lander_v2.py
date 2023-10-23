@@ -1,6 +1,6 @@
-import gym
+import gymnasium as gym
 import torch
-from simple_ne.simple_ne import SimpleNEPopulation, SimpleNEAgent
+from simple_ne.base_population import SimpleNEPopulation, SimpleNEAgent
 from simple_ne.preset_params import get_named_params
 import pickle
 
@@ -15,7 +15,8 @@ def play_game(net : SimpleNEAgent, render=False):
     actions = []
     while not done:
         out = net(torch.tensor(obs, dtype=torch.float32))
-        action = torch.argmax(out).item()
+        print(out)
+        action = torch.argmax(out, 0).item()
         actions.append(float(action))
         obs, r, done, _, _ = env.step(action)
         rs += r
@@ -25,6 +26,7 @@ def play_game(net : SimpleNEAgent, render=False):
 
 def eval_pop(population):
     fitness_list = []
+    print(len(population))
     for net_idx in range(len(population)):
         fitness_list.append(play_game(population[net_idx]))
     return torch.tensor(fitness_list, dtype=torch.float32)

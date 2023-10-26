@@ -83,7 +83,6 @@ class SimpleNEPopulation():
             if len(connection_keys.size()) == 0:
                 connection_keys = torch.tensor([torch.argmax(torch.rand(self.in_size + self.out_size + len(nodes)-2))])
             key = self.in_size + len(nodes) + i
-            print("adding output node")
             nodes.append(self.create_node(
                 activation_key,
                 connection_keys,
@@ -153,7 +152,8 @@ class SimpleNEPopulation():
             activations[activation_ix],
             connections,
             node_key,
-            weights=weights)
+            weights=weights,
+            is_output=is_output)
     
     def create_net(self, nodes, in_size, out_size):
         return SimpleNEAgent(nodes, in_size, out_size)

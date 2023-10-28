@@ -36,7 +36,6 @@ class SimpleNEPopulation():
             else:
                 self.prob_params = torch.rand(species, 4)
         self.elite_cutoff = int(self.pop_size * self.prob_params[0])
-        self.init_population()
 
     def init_population(self):
         for i in range(self.pop_size):

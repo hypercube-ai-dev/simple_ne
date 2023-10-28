@@ -34,7 +34,7 @@ class AttentionNeNode(torch.nn.Module):
 class AttentionNeNet(torch.nn.Module):
 
     def __init__(self, nodes: AttentionNeNode, in_size, out_size, max_context_length):
-        super.__init__()
+        super().__init__()
         self.in_size = in_size
         self.out_size = out_size
         self.nodes = nodes

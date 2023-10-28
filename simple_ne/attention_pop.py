@@ -5,17 +5,17 @@ from .activations import activations
 from .attention_nets import AttentionNeNet, AttentionNeNode
 from .base_population import SimpleNEPopulation
 
-class SimpleNEPopulation():
+class SimpleNEAttentionPopulation(SimpleNEPopulation):
     def __init__(
             self, 
             input_size, 
             output_size, 
             max_size, 
             pop_size, 
-            max_context_len,
             species=1, 
             output_activation = None,
             prob_params = None,
+            max_context_len = 8,
             in_layer=True):
         super().__init__(
             input_size,

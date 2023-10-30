@@ -5,22 +5,24 @@ from simple_ne.preset_params import get_named_params
 import pickle
 
 def play_game(net : AttentionNeNet, render=False):
-    if render:
-        env = gym.make("LunarLander-v2", render_mode="human")
-    else:
-        env = gym.make("LunarLander-v2")
-    obs,_ = env.reset()
-    done = False
-    rs = 0
-    actions = []
-    while not done:
-        out = net(torch.tensor(obs, dtype=torch.float32))
-        #print(out)
-        action = torch.argmax(out, 0).item()
-        actions.append(float(action))
-        obs, r, done, _, _ = env.step(action)
-        rs += r
-    env.close()
+    with torch.no_grad():
+        net.reset()
+        if render:
+            env = gym.make("LunarLander-v2", render_mode="human")
+        else:
+            env = gym.make("LunarLander-v2")
+        obs,_ = env.reset()
+        done = False
+        rs = 0
+        actions = []
+        while not done:
+            out = net(torch.tensor(obs, dtype=torch.float32))
+            #print(out)
+            action = torch.argmax(out, 0).item()
+            actions.append(float(action))
+            obs, r, done, _, _ = env.step(action)
+            rs += r
+        env.close()
     #print(r)
     return rs
 

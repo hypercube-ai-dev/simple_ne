@@ -98,7 +98,7 @@ class SimpleNEPopulation():
         for i in mutate_node_idxs:
             mutated = True
             n = net_nodes[i]
-            mutation = torch.rand(len(n.in_idxs)) - torch.rand(len(n.in_idxs))
+            mutation = torch.rand(n.weights.shape)
             n.weights += mutation
         add_node = random() < self.prob_params[1]
         if add_node == True:
@@ -107,19 +107,16 @@ class SimpleNEPopulation():
             connection_keys = self.get_connection_keys(len(net_nodes))
             if len(connection_keys.size()) == 0:
                 connection_keys = torch.tensor([torch.argmax(torch.rand(self.in_size + self.out_size + len(net_nodes)-2))])
-            weights = torch.randn(len(connection_keys))
             key = len(net_nodes)
             net_nodes.append(self.create_node(
                 activation_key,
                 connection_keys,
-                key,
-                weights=weights
+                key
             ))
             add_conns_from_node = (torch.rand(len(net_nodes) - 1) < self.prob_params[3]).nonzero()
             for i in add_conns_from_node:
                 to_node = net_nodes[i]
-                torch.cat((to_node.in_idxs, torch.tensor([key])))
-                torch.cat((to_node.weights, torch.randn(1)))
+                to_node.add_connection(key)
         if mutated == True:
             return self.create_net(net_nodes, self.in_size, self.out_size)
         else:
@@ -146,12 +143,11 @@ class SimpleNEPopulation():
         for i in range (self.pop_size - len(self.population)):
             self.population.append(self.create_genome())
 
-    def create_node(self, activation_ix, connections, node_key, weights=None, is_output=False):
+    def create_node(self, activation_ix, connections, node_key, is_output=False):
         return SimpleNENode(
             activations[activation_ix],
             connections,
             node_key,
-            weights=weights,
             is_output=is_output)
     
     def create_net(self, nodes, in_size, out_size):

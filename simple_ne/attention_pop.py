@@ -29,7 +29,7 @@ class SimpleNEAttentionPopulation(SimpleNEPopulation):
         )
         self.max_context_len = max_context_len
     
-    def create_node(self, activation_ix, connections, node_key, weights=None, is_output=False):
+    def create_node(self, activation_ix, connections, node_key, is_output=False):
         return AttentionNeNode(
             connections, 
             activations[activation_ix],

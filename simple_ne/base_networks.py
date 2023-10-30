@@ -20,6 +20,10 @@ class SimpleNENode(object):
         else:
             inputs = torch.index_select(inputs, 0, self.in_idxs)
         return self.activation(torch.matmul(self.weights, inputs))
+    
+    def add_con(self, key):
+        torch.cat((self.in_idxs, torch.tensor([key])))
+        torch.cat((self.weights, torch.randn(1)))
 
 class SimpleNEAgent(nn.Module):
     def __init__(self, nodes: list[SimpleNENode], input_size, output_size, batch_size = 0):

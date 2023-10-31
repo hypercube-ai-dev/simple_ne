@@ -18,8 +18,8 @@ class AttentionNeNode(torch.nn.Module):
         super().__init__()
         self.in_idxs = in_keys
         # qkv so multiply by three
-        self.weights = torch.randn(len(in_keys), len(in_keys)*3)
-        self.o_proj = torch.randn(len(in_keys), 1)
+        self.weights = torch.randn(len(in_keys), 3)
+        #self.o_proj = torch.randn(len(in_keys), 1)
         self.activation = activation
         self.key = node_key
         self.is_output = is_output
@@ -32,12 +32,14 @@ class AttentionNeNode(torch.nn.Module):
         qkv_proj = torch.matmul(inputs, self.weights)
         q,k,v = qkv_proj.chunk(3, dim=-1)
         values,_ = scaled_dot_product(q,k,v)
-        out = self.activation(torch.matmul(values[-1:,], self.o_proj))
+        out = self.activation(values[-1:,])
+        #out = self.activation(torch.matmul(values[-1:,], self.o_proj))
         return out
     
     def add_connection(self, key):
         torch.cat((self.in_idxs, torch.tensor([key])))
-        torch.cat((self.weights, torch.randn(1)))
+        # add qkv weights for new incoming connection
+        torch.cat((self.weights, torch.randn(1, 3)))
 
 class AttentionNeNet(torch.nn.Module):
 

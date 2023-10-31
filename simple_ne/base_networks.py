@@ -21,7 +21,7 @@ class SimpleNENode(object):
             inputs = torch.index_select(inputs, 0, self.in_idxs)
         return self.activation(torch.matmul(self.weights, inputs))
     
-    def add_con(self, key):
+    def add_connection(self, key):
         torch.cat((self.in_idxs, torch.tensor([key])))
         torch.cat((self.weights, torch.randn(1)))
 

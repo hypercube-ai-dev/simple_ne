@@ -36,7 +36,7 @@ def eval_pop(population):
 if __name__ == '__main__':
     pop_params = get_named_params("bernolli", 4)
     pop_params[0] = .5
-    pop = SimpleNEAttentionPopulation(8, 4, 200, 100, prob_params = pop_params)
+    pop = SimpleNEAttentionPopulation(8, 4, 200, 21, prob_params = pop_params, max_context_len=89)
     pop.init_population()
     best_fitness = 0
 
@@ -46,14 +46,14 @@ if __name__ == '__main__':
         fits = eval_pop(pop.population)
         avg_fitness = fits.mean()
         best_fitness = fits.max()
-        if epoch_counter % 5 == 0:
-            print(f"Epoch {epoch_counter} avg fitness: {avg_fitness} best fitness: {fits.max()}")
+        #if epoch_counter % 5 == 0:
+        print(f"Epoch {epoch_counter} avg fitness: {avg_fitness} best fitness: {fits.max()}")
         epoch_counter += 1
         pop.evolve(fits)
     print(f"solved in {epoch_counter} generations")
     solved_net = pop.population[torch.argmax(fits).item()]
     for x in range(5):
         print(play_game(solved_net, True))
-    pickle.dump(solved_net,  open('./saved_models/lunar-lander-solver.pkl', 'wb'))
+    pickle.dump(solved_net,  open('./saved_models/lunar-lander-solver-attention.pkl', 'wb'))
     solved_net.print_model_details()
 

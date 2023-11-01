@@ -26,9 +26,18 @@ class SimpleNeEsPopulation(SimpleNEPopulation):
             prob_params,
             in_layer
         )
+        self.num_species = species
     
+    def set_prob_params(self, prob_params, species):
+        if prob_params != None:
+            self.prob_params = prob_params
+        else:
+            self.prob_params = torch.rand(4)
+
     def init_population(self):
-        for i in range(self.pop_size):
+        for i in range(self.num_species):
+            # will need to use modulo to determine which species in
+            # reproduction/mutation logic
             self.population.append(self.create_genome())
         return
     

@@ -28,6 +28,10 @@ class SimpleNEPopulation():
         2 -> mutate rate (0,1)
         3 -> prob add connection (0,1)
         '''
+        self.set_prob_params(prob_params, species)
+        self.elite_cutoff = int(self.pop_size * self.prob_params[0])
+
+    def set_prob_params(self, prob_params, species):
         if prob_params != None:
             self.prob_params = prob_params
         else:
@@ -35,7 +39,6 @@ class SimpleNEPopulation():
                 self.prob_params = torch.rand(4)
             else:
                 self.prob_params = torch.rand(species, 4)
-        self.elite_cutoff = int(self.pop_size * self.prob_params[0])
 
     def init_population(self):
         for i in range(self.pop_size):

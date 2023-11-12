@@ -1,7 +1,10 @@
 import torch
 from torch import nn
 from random import random
+
+from simple_ne.base_networks import SimpleNEAgent
 from .activations import activations
+from .base_networks import SimpleNEAgent, SimpleNENode
 from .attention_nets import AttentionNeNet, AttentionNeNode
 from .base_population import SimpleNEPopulation
 
@@ -11,8 +14,8 @@ class SimpleNeEsPopulation(SimpleNEPopulation):
             input_size, 
             output_size, 
             max_size, 
-            pop_size, 
-            species=2, 
+            pop_size=100, 
+            species=10, 
             output_activation = None,
             prob_params = None,
             in_layer=True):
@@ -38,9 +41,20 @@ class SimpleNeEsPopulation(SimpleNEPopulation):
         for i in range(self.num_species):
             # will need to use modulo to determine which species in
             # reproduction/mutation logic
-            self.population.append(self.create_genome())
+            initial_genome = self.create_genome()
+            weight_dict = initial_genome.get_weights_as_dict()
+            self.population.append(initial_genome)
+            for g in range((self.pop_size // self.num_species)-1):
+                es_g_nodes = []
+                for n in initial_genome.nodes:
+                    new_weights = torch.randn(n.weights.shape)
+                    es_g_nodes.append(SimpleNENode(n.activation, n.in_idxs, n.node_key, new_weights))
+                self.population.append(SimpleNEAgent(es_g_nodes, initial_genome.in_size, initial_genome.out_size, initial_genome.batch_size))
         return
     
+    def mutate_genome(self, net: SimpleNEAgent):
+        net_weights = net.get_weights_as_dict()
+        return
 
 class SimpleNeEsAttentionPopulation(SimpleNeEsPopulation):
     def __init__(

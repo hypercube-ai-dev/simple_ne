@@ -43,21 +43,24 @@ class SimpleNeEsPopulation(SimpleNEPopulation):
             # will need to use modulo to determine which species in
             # reproduction/mutation logic
             initial_genome = self.create_genome()
-            weight_dict = initial_genome.get_weights_as_dict()
             self.population.append(initial_genome)
-            for g in range((self.pop_size // self.num_species)-1):
-                es_g_nodes = []
-                for n in initial_genome.nodes:
-                    new_weights = torch.randn(n.weights.shape)
-                    es_g_nodes.append(SimpleNENode(n.activation, n.in_idxs, n.node_key, new_weights))
-                self.population.append(SimpleNEAgent(es_g_nodes, initial_genome.in_size, initial_genome.out_size, initial_genome.batch_size))
+            self.es_mutate(initial_genome)
         return
     
     def evolve(self, fitness_list):
-        top_nets, top_net_idxs = torch.topk(fitness_list, self.elite_cutoff)
+        top_nets, top_net_idxs = torch.topk(fitness_list, self.num_species//2)
         elites = [self.population[i] for i in top_net_idxs]
         self.population = []
-        for x in range()
+        for x in range(len(elites)):
+            self.population.append(elites[x])
+            
+    def es_mutate(self, initial_genome):
+        for g in range((self.pop_size // self.num_species)-1):
+            es_g_nodes = []
+            for n in initial_genome.nodes:
+                new_weights = torch.randn(n.weights.shape)
+                es_g_nodes.append(SimpleNENode(n.activation, n.in_idxs, n.node_key, new_weights))
+            self.population.append(SimpleNEAgent(es_g_nodes, initial_genome.in_size, initial_genome.out_size, initial_genome.batch_size))
 
     def mutate_genome(self, net: SimpleNEAgent):
         net_weights = net.get_weights_as_dict()

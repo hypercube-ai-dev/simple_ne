@@ -29,6 +29,7 @@ class SimpleNeEsPopulation(SimpleNEPopulation):
             prob_params,
             in_layer
         )
+        self.elite_cutoff = int(species * prob_params[0])
         self.num_species = species
     
     def set_prob_params(self, prob_params, species):
@@ -52,6 +53,12 @@ class SimpleNeEsPopulation(SimpleNEPopulation):
                 self.population.append(SimpleNEAgent(es_g_nodes, initial_genome.in_size, initial_genome.out_size, initial_genome.batch_size))
         return
     
+    def evolve(self, fitness_list):
+        top_nets, top_net_idxs = torch.topk(fitness_list, self.elite_cutoff)
+        elites = [self.population[i] for i in top_net_idxs]
+        self.population = []
+        for x in range()
+
     def mutate_genome(self, net: SimpleNEAgent):
         net_weights = net.get_weights_as_dict()
         return

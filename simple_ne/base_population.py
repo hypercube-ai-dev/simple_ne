@@ -93,7 +93,7 @@ class SimpleNEPopulation():
             ))
         return self.create_net(nodes, self.in_size, self.out_size)
     
-    def mutate_genome(self, net: SimpleNEAgent):
+    def mutate_genome(self, net: SimpleNEAgent) -> SimpleNEAgent:
         mutated = False
         mutate_probs = torch.rand(len(net.nodes))
         mutate_node_idxs = (mutate_probs < self.prob_params[2]).nonzero()
@@ -153,5 +153,5 @@ class SimpleNEPopulation():
             node_key,
             is_output=is_output)
     
-    def create_net(self, nodes, in_size, out_size):
+    def create_net(self, nodes, in_size, out_size) -> SimpleNEAgent:
         return SimpleNEAgent(nodes, in_size, out_size)

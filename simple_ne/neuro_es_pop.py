@@ -75,6 +75,38 @@ class SimpleNeEsPopulation(SimpleNEPopulation):
     def mutate_genome(self, net: SimpleNEAgent):
         net_weights = net.get_weights_as_dict()
         return
+    
+class SimpleNeEsParamsPopulation(SimpleNEPopulation):
+    def __init__(
+            self, 
+            input_size, 
+            output_size, 
+            max_size, 
+            pop_size, 
+            num_species=2, 
+            output_activation = None,
+            prob_params = None,
+            max_context_len = 8,
+            in_layer=True
+    ):
+        super().__init__(
+            input_size,
+            output_size,
+            max_size,
+            pop_size,
+            output_activation,
+            prob_params,
+            in_layer
+        )
+        self.populations = [[] for _ in range(num_species)]
+        self.num_species = num_species
+
+    def set_prob_params(self, prob_params, species):
+        if prob_params != None:
+            self.prob_params = prob_params
+        else:
+            self.prob_params = torch.rand(species, 4)
+
 
 class SimpleNeEsAttentionPopulation(SimpleNeEsPopulation):
     def __init__(

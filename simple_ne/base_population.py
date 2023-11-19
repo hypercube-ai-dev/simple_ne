@@ -10,8 +10,7 @@ class SimpleNEPopulation():
             input_size, 
             ouput_size, 
             max_size, 
-            pop_size, 
-            species=1, 
+            pop_size,
             output_activation = None,
             prob_params = None,
             in_layer=True):
@@ -28,17 +27,14 @@ class SimpleNEPopulation():
         2 -> mutate rate (0,1)
         3 -> prob add connection (0,1)
         '''
-        self.set_prob_params(prob_params, species)
+        self.set_prob_params(prob_params)
         self.elite_cutoff = int(self.pop_size * self.prob_params[0])
 
-    def set_prob_params(self, prob_params, species):
+    def set_prob_params(self, prob_params):
         if prob_params != None:
             self.prob_params = prob_params
         else:
-            if species == 1:
-                self.prob_params = torch.rand(4)
-            else:
-                self.prob_params = torch.rand(species, 4)
+            self.prob_params = torch.rand(4)
 
     def init_population(self):
         for i in range(self.pop_size):

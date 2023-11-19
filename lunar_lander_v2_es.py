@@ -24,9 +24,11 @@ def play_game(net : SimpleNEAgent, render=False):
 
 def eval_pop(population):
     fitness_list = []
-    print(len(population))
     for net_idx in range(len(population)):
-        fitness_list.append(play_game(population[net_idx]))
+        total_fit = 0   
+        for x in range(5):
+            total_fit += play_game(population[net_idx])
+        fitness_list.append(total_fit / 5)
     return torch.tensor(fitness_list, dtype=torch.float32)
 
 if __name__ == '__main__':
@@ -37,10 +39,8 @@ if __name__ == '__main__':
     best_fitness = 0
 
     epoch_counter = 0
-    print(len(pop.population))
     while best_fitness < 200:
         fits = eval_pop(pop.population)
-        print(fits)
         avg_fitness = fits.mean()
         best_fitness = fits.max()
         if epoch_counter % 5 == 0:

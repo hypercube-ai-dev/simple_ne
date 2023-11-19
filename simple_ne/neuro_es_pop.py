@@ -30,7 +30,7 @@ class SimpleNeEsPopulation(SimpleNEPopulation):
         )
         self.num_species = species
         self.species_size = pop_size // species
-
+        self.elite_cutoff = int(self.num_species * self.prob_params[0])
     def init_population(self):
         for i in range(self.num_species):
             # will need to use modulo to determine which species in
@@ -46,13 +46,14 @@ class SimpleNeEsPopulation(SimpleNEPopulation):
             self.population.append(mg)
 
     def evolve(self, fitness_list):
-        top_nets, top_net_idxs = torch.topk(fitness_list, self.elite_cutoff//2)
+        top_nets, top_net_idxs = torch.topk(fitness_list, self.elite_cutoff)
         elites = [self.population[i] for i in top_net_idxs]
         self.population = []
         for x in range(len(elites)):
             self.population.append(elites[x])
-            self.population.append(self.es_mutate(elites[x]))
-            mutated = self.mutate_genome()
+            for _ in range(self.species_size):
+                self.population.append(self.es_mutate(elites[x]))
+            mutated = self.mutate_genome(elites[x])
             if mutated != None:
                 self.population.append(mutated)
         for _ in range((self.pop_size - len(self.population)) // self.species_size):

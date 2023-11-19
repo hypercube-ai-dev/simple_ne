@@ -30,6 +30,7 @@ class SimpleNeEsPopulation(SimpleNEPopulation):
             in_layer
         )
         self.num_species = species
+        self.species_size = pop_size // species
     
     def set_prob_params(self, prob_params, species):
         if prob_params != None:
@@ -41,11 +42,16 @@ class SimpleNeEsPopulation(SimpleNEPopulation):
         for i in range(self.num_species):
             # will need to use modulo to determine which species in
             # reproduction/mutation logic
-            initial_genome = self.create_genome()
-            self.population.append(initial_genome)
-            self.es_mutate(initial_genome)
+            self.init_species()
         return
     
+    def init_species(self):
+        new_genome = self.create_genome()
+        self.population.append(new_genome)
+        for x in range(self.species_size-1):
+            mg = self.es_mutate(new_genome)
+            self.population.append(mg)
+
     def evolve(self, fitness_list):
         top_nets, top_net_idxs = torch.topk(fitness_list, self.elite_cutoff//2)
         elites = [self.population[i] for i in top_net_idxs]
@@ -56,14 +62,15 @@ class SimpleNeEsPopulation(SimpleNEPopulation):
             mutated = self.mutate_genome()
             if mutated != None:
                 self.population.append(mutated)
+        for _ in range((self.pop_size - len(self.population)) // self.species_size):
+            self.init_species()
             
     def es_mutate(self, initial_genome):
-        for g in range((self.pop_size // self.num_species)-1):
-            es_g_nodes = []
-            for n in initial_genome.nodes:
-                new_weights = torch.randn(n.weights.shape)
-                es_g_nodes.append(SimpleNENode(n.activation, n.in_idxs, n.node_key, new_weights))
-            return SimpleNEAgent(es_g_nodes, initial_genome.in_size, initial_genome.out_size, initial_genome.batch_size)
+        es_g_nodes = []
+        for n in initial_genome.nodes:
+            new_weights = torch.randn(n.weights.shape)
+            es_g_nodes.append(SimpleNENode(n.activation, n.in_idxs, n.node_key, new_weights))
+        return SimpleNEAgent(es_g_nodes, initial_genome.in_size, initial_genome.out_size, initial_genome.batch_size)
 
     def mutate_genome(self, net: SimpleNEAgent):
         net_weights = net.get_weights_as_dict()

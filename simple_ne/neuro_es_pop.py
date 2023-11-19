@@ -24,19 +24,12 @@ class SimpleNeEsPopulation(SimpleNEPopulation):
             output_size,
             max_size,
             pop_size,
-            species,
             output_activation,
             prob_params,
             in_layer
         )
         self.num_species = species
         self.species_size = pop_size // species
-    
-    def set_prob_params(self, prob_params, species):
-        if prob_params != None:
-            self.prob_params = prob_params
-        else:
-            self.prob_params = torch.rand(4)
 
     def init_population(self):
         for i in range(self.num_species):
@@ -69,7 +62,7 @@ class SimpleNeEsPopulation(SimpleNEPopulation):
         es_g_nodes = []
         for n in initial_genome.nodes:
             new_weights = torch.randn(n.weights.shape)
-            es_g_nodes.append(SimpleNENode(n.activation, n.in_idxs, n.node_key, new_weights))
+            es_g_nodes.append(SimpleNENode(n.activation, n.in_idxs, n.node_key, new_weights, n.is_output))
         return SimpleNEAgent(es_g_nodes, initial_genome.in_size, initial_genome.out_size, initial_genome.batch_size)
 
     def mutate_genome(self, net: SimpleNEAgent):
@@ -86,7 +79,6 @@ class SimpleNeEsParamsPopulation(SimpleNEPopulation):
             num_species=2, 
             output_activation = None,
             prob_params = None,
-            max_context_len = 8,
             in_layer=True
     ):
         super().__init__(
@@ -101,11 +93,11 @@ class SimpleNeEsParamsPopulation(SimpleNEPopulation):
         self.populations = [[] for _ in range(num_species)]
         self.num_species = num_species
 
-    def set_prob_params(self, prob_params, species):
+    def set_prob_params(self, prob_params):
         if prob_params != None:
             self.prob_params = prob_params
         else:
-            self.prob_params = torch.rand(species, 4)
+            self.prob_params = torch.rand(self.num_species, 4)
 
 
 class SimpleNeEsAttentionPopulation(SimpleNeEsPopulation):
@@ -125,7 +117,6 @@ class SimpleNeEsAttentionPopulation(SimpleNeEsPopulation):
             output_size,
             max_size,
             pop_size,
-            species,
             output_activation,
             prob_params,
             in_layer

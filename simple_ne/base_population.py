@@ -43,13 +43,6 @@ class SimpleNEPopulation():
     
     def create_genome(self):
         nodes = []
-        '''
-        for i in range(self.in_size):
-            activation_key = torch.argmax(torch.rand(len(activations)))
-            key = i
-            connection_keys = (torch.rand(self.input_size) < self.prob_params[3]).nonzero()
-            weights = torch.rand(len(connection_keys))
-        '''
         add_node = random() < self.prob_params[1]
         if self.in_layer:
             for x in range(self.in_size):

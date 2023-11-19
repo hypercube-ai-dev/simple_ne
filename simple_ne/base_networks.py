@@ -83,6 +83,8 @@ class SimpleNEAgent(nn.Module):
 
     def print_model_details(self):
         for node in self.nodes:
+            if node.is_output:
+                print("output node")
             print(f"node key {node.node_key}, connections to {node.in_idxs}")
         num_cons = sum(len(n.in_idxs) for n in self.nodes)
         print(f"{len(self.nodes)} total nodes \n {num_cons} total connections")

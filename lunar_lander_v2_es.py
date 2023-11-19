@@ -15,13 +15,11 @@ def play_game(net : SimpleNEAgent, render=False):
     actions = []
     while not done:
         out = net(torch.tensor(obs, dtype=torch.float32))
-        print(out)
         action = torch.argmax(out, 0).item()
         actions.append(float(action))
         obs, r, done, _, _ = env.step(action)
         rs += r
     env.close()
-    #print(r)
     return rs
 
 def eval_pop(population):

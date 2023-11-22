@@ -46,9 +46,9 @@ def relu_activation(x):
 activations = [
     sigmoid_activation,
     tanh_activation,
-    abs_activation,
-    gauss_activation,
-    identity_activation,
-    sin_activation,
+    #abs_activation,
+    #gauss_activation,
+    #identity_activation,
+    #sin_activation,
     relu_activation,
 ]

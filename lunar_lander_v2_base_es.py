@@ -1,8 +1,10 @@
 import gymnasium as gym
 import torch
-from simple_ne.base_population import SimpleNEPopulation, SimpleNEAgent
+from simple_ne.base_population import SimpleNEPopulation, SimpleNEAgent, SimpleNENode
 from simple_ne.preset_params import get_named_params
 import pickle
+
+es_size = 10
 
 def play_game(net : SimpleNEAgent, render=False):
     if render:
@@ -24,11 +26,31 @@ def play_game(net : SimpleNEAgent, render=False):
     net.reset()
     return rs
 
+def get_es_nets(net: SimpleNEAgent):
+    es_pop = []
+    for x in range(es_size):
+        es_nodes = []
+        for n in net.nodes:
+            es_w = n.weights * (.5 * torch.randn(n.weights.shape))
+            es_nodes.append(SimpleNENode(n.activation, n.in_idxs, n.node_key, es_w, n.is_output))
+        es_pop.append(SimpleNEAgent(es_nodes, net.in_size, net.out_size, net.batch_size))
+    es_pop.append(net)
+    return es_pop
+
+def make_es_adjustments(net, scores, nets):
+    
+    return 
+
 def eval_pop(population):
     fitness_list = []
     print(len(population))
     for net_idx in range(len(population)):
-        fitness_list.append(play_game(population[net_idx]))
+        es_pop = get_es_nets(population[net_idx])
+        es_scores = []
+        for n in es_pop:
+            es_scores.append(play_game(n))
+        es_updated = 
+        fitness_list.append()
     return torch.tensor(fitness_list, dtype=torch.float32)
 
 if __name__ == '__main__':

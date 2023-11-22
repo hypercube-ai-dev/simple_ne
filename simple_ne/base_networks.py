@@ -65,17 +65,17 @@ class SimpleNEAgent(nn.Module):
     
     def get_weights(self, flattened=False):
         if not flattened:
-            return self.get_weights_as_dict()
+            return self.__get_weights_as_dict()
         else:
-            return self.get_weights_flattened()
+            return self.__get_weights_flattened()
 
-    def get_weights_flattened(self):
+    def __get_weights_flattened(self):
         weights_list = torch.tensor()
         for n in self.nodes:
             weights_list += n.weights
         return weights_list
         
-    def get_weights_as_dict(self):
+    def __get_weights_as_dict(self):
         weight_dict = {}
         for n in self.nodes:
             weight_dict[n.node_key] = n.weights

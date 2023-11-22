@@ -62,7 +62,7 @@ class SimpleNeEsPopulation(SimpleNEPopulation):
     def es_mutate(self, initial_genome):
         es_g_nodes = []
         for n in initial_genome.nodes:
-            new_weights = torch.randn(n.weights.shape)
+            new_weights = torch.rand(n.weights.shape)
             es_g_nodes.append(SimpleNENode(n.activation, n.in_idxs, n.node_key, new_weights, n.is_output))
         return SimpleNEAgent(es_g_nodes, initial_genome.in_size, initial_genome.out_size, initial_genome.batch_size)
 

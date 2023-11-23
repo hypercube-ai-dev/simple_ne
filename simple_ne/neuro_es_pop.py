@@ -29,19 +29,22 @@ class SimpleNeEsPopulation(SimpleNEPopulation):
             in_layer
         )
         self.num_species = species
-        self.species_size = pop_size // species
-        self.elite_cutoff = int(self.num_species * self.prob_params[0])
+        self.es_size = species
+        self.elite_cutoff = int(self.pop_size * self.prob_params[0])
     def init_population(self):
-        for i in range(self.num_species):
+        for i in range(self.population):
             # will need to use modulo to determine which species in
             # reproduction/mutation logic
             self.init_species()
         return
     
-    def init_species(self):
-        new_genome = self.create_genome()
+    def init_species(self, ng = None):
+        if ng == None:
+            new_genome = self.create_genome()
+        else:
+            new_genome = ng
         self.population.append(new_genome)
-        for x in range(self.species_size-1):
+        for x in range(self.es_size):
             mg = self.es_mutate(new_genome)
             self.population.append(mg)
 
@@ -50,12 +53,10 @@ class SimpleNeEsPopulation(SimpleNEPopulation):
         elites = [self.population[i] for i in top_net_idxs]
         self.population = []
         for x in range(len(elites)):
-            self.population.append(elites[x])
-            for _ in range(self.species_size):
-                self.population.append(self.es_mutate(elites[x]))
+            self.init_species(elites[x])
             mutated = self.mutate_genome(elites[x])
             if mutated != None:
-                self.population.append(mutated)
+                self.init_species(mutated)
         for _ in range((self.pop_size - len(self.population)) // self.species_size):
             self.init_species()
             
@@ -65,10 +66,6 @@ class SimpleNeEsPopulation(SimpleNEPopulation):
             new_weights = torch.rand(n.weights.shape)
             es_g_nodes.append(SimpleNENode(n.activation, n.in_idxs, n.node_key, new_weights, n.is_output))
         return SimpleNEAgent(es_g_nodes, initial_genome.in_size, initial_genome.out_size, initial_genome.batch_size)
-
-    def mutate_genome(self, net: SimpleNEAgent):
-        net_weights = net.get_weights_as_dict()
-        return
     
 class SimpleNeEsParamsPopulation(SimpleNEPopulation):
     def __init__(

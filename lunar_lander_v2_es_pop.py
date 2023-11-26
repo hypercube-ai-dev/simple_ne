@@ -34,7 +34,7 @@ def eval_pop(population):
 if __name__ == '__main__':
     pop_params = get_named_params("bernolli", 4)
     pop_params[0] = .5
-    pop = SimpleNeEsPopulation(8, 4, 200, pop_size = 100, species=10, prob_params = pop_params)
+    pop = SimpleNeEsPopulation(8, 4, 200, pop_size = 50, species=2, prob_params = pop_params)
     pop.init_population()
     best_fitness = 0
 
@@ -43,8 +43,8 @@ if __name__ == '__main__':
         fits = eval_pop(pop.population)
         avg_fitness = fits.mean()
         best_fitness = fits.max()
-        if epoch_counter % 5 == 0:
-            print(f"Epoch {epoch_counter} avg fitness: {avg_fitness} best fitness: {fits.max()}")
+        #if epoch_counter % 5 == 0:
+        print(f"Epoch {epoch_counter} avg fitness: {avg_fitness} best fitness: {fits.max()}")
         epoch_counter += 1
         pop.evolve(fits)
     print(f"solved in {epoch_counter} generations")

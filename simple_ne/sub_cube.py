@@ -8,10 +8,10 @@ class SubDivisionCube(object):
         self.dim = dim
         self.depth = depth
         self.signs = list(itertools.product([1,-1], repeat=len(dim)))
-        self.div_array = {}
-        self.initial_divide()
+        self.tree = []
+        self.build_tree()
 
-    def initial_divide(self):
+    def build_tree(self):
         depth = 0
         while depth < self.depth:
             depth += 1

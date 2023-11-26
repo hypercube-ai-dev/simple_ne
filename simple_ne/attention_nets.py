@@ -84,3 +84,16 @@ class AttentionNeNet(torch.nn.Module):
     
     def activate_batched(self, inputs):
         return
+
+class SimpleAttentionNeNode(torch.nn.Module):
+
+    def __init__(self, in_size, out_size, node_key, is_output=False, weights=None):
+        super().__init__()
+        self.is_output = is_output
+        if weights == None:
+            self.weights = torch.rand(in_size, out_size * 3)
+        self.node_key = node_key
+
+class SimpleAttentionNeNet(torch.nn.Module):
+
+    def __init__(self, )

@@ -31,39 +31,46 @@ class SimpleNeEsPopulation(SimpleNEPopulation):
         self.num_species = species
         self.es_size = species
         self.elite_cutoff = int(self.pop_size * self.prob_params[0])
+        self.sigma = .1
     def init_population(self):
-        for i in range(self.population):
+        for i in range(self.pop_size):
             # will need to use modulo to determine which species in
             # reproduction/mutation logic
             self.init_species()
         return
     
     def init_species(self, ng = None):
+        survivor = False
         if ng == None:
             new_genome = self.create_genome()
         else:
             new_genome = ng
+            survivor = True
         self.population.append(new_genome)
         for x in range(self.es_size):
-            mg = self.es_mutate(new_genome)
+            mg = self.__es_mutate(new_genome, survivor)
             self.population.append(mg)
 
     def evolve(self, fitness_list):
         top_nets, top_net_idxs = torch.topk(fitness_list, self.elite_cutoff)
         elites = [self.population[i] for i in top_net_idxs]
         self.population = []
+        mutates = 0
         for x in range(len(elites)):
             self.init_species(elites[x])
             mutated = self.mutate_genome(elites[x])
             if mutated != None:
                 self.init_species(mutated)
-        for _ in range((self.pop_size - len(self.population)) // self.species_size):
+                mutates += 1
+        for _ in range(self.pop_size - (len(elites) + mutates)):
             self.init_species()
             
-    def es_mutate(self, initial_genome):
+    def __es_mutate(self, initial_genome, survivor):
         es_g_nodes = []
         for n in initial_genome.nodes:
-            new_weights = torch.rand(n.weights.shape)
+            if survivor:
+                new_weights = n.weights + (self.sigma * torch.rand(n.weights.shape))
+            new_weights = torch.randn(n.weights.shape)
             es_g_nodes.append(SimpleNENode(n.activation, n.in_idxs, n.node_key, new_weights, n.is_output))
         return SimpleNEAgent(es_g_nodes, initial_genome.in_size, initial_genome.out_size, initial_genome.batch_size)
     

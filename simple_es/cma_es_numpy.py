@@ -26,13 +26,18 @@ class CMAEsPopulation:
         while (solved == False and i < iterations):
             self.gen_pop()
             ranked = self.rank_population(obj_func)
-            elite = [x[0] for x in ranked[:int(self.pop_size / 2)]]
-            elite_reward = ranked[0][1]
+            elite = [x[0] for x in ranked[:int(self.pop_size / 10)]]
+            elite_reward = np.mean([x[1] for x in ranked[:int(self.pop_size / 2)]])
+            #elite_reward = ranked[0][1]
             #if i % 10:
             print(f"episode: {i} avage top half reward: {elite_reward}")
             if elite_reward < -200:
                 solved = True
-            self.mean = self.mean + learning_rate_mean * np.mean(elite, axis=0)
+            if ranked[0][1] < -200:
+                self.mean = elite[0]
+            else:
+                self.mean = self.mean + learning_rate_mean * np.mean(elite, axis=0)
+            #self.mean = elite[0]
             self.update_sigma(elite, learning_rate_covariance)
             i += 1
         return self.mean

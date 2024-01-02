@@ -40,18 +40,20 @@ def play_game(net, render=False):
         env = gym.make("LunarLander-v2")
     obs,_ = env.reset()
     done = False
+    trunc = False
     rs = 0
     actions = []
     e = 0
     while (not done and e < 1000):
         #print(net)
-        normalizer.observe(obs)
-        obs = normalizer.normalize(obs)
+        #normalizer.observe(obs)
+        #obs = normalizer.normalize(obs)
+        #out = np.dot(obs, np.reshape(net[:64], (8,8)))
         out = np.dot(obs, np.reshape(net, (8,4)))
         #print(out)
         action = np.random.choice(np.flatnonzero(out==out.max()))
         actions.append(float(action))
-        obs, r, done, _, _ = env.step(action)
+        obs, r, done, trunc, _ = env.step(action)
         rs += r
         e += 1
     env.close()
@@ -59,5 +61,7 @@ def play_game(net, render=False):
 
 if __name__ == '__main__':
     es = CMAEsPopulation(100, 32)
-    es.run_population(play_game, 1000)
+    solved_net = es.run_population(play_game, 1000)
+    for x in range(5):
+        print(play_game(solved_net, True))
 

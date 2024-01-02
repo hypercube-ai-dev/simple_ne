@@ -1,12 +1,39 @@
 import gymnasium as gym
-import torch
-from simple_ne.base_population import SimpleNEPopulation, SimpleNEAgent, SimpleNENode
 from simple_ne.preset_params import get_named_params
+from simple_es.cma_es_numpy import CMAEsPopulation
+import numpy as np
+import torch
 import pickle
 
 es_size = 10
+class Normalizer:
+    """
+    Normalizer standardizes the inputs to have approximately zero mean and unit variance.
+    See https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance on Welford's online algorithm.
+    """
 
-def play_game(net : SimpleNEAgent, render=False):
+    def __init__(self, nb_inputs):
+        self.n = np.zeros(nb_inputs)
+        self.mean = np.zeros(nb_inputs)
+        self.mean_diff = np.zeros(nb_inputs)
+        self.var = np.zeros(nb_inputs)
+
+    def observe(self, x):
+        self.n += 1.0
+        last_mean = self.mean.copy()
+        self.mean += (x - self.mean) / self.n
+        self.mean_diff += (x - last_mean) * (x - self.mean)
+        self.var = (self.mean_diff / self.n).clip(min=1e-2)
+
+    def normalize(self, inputs):
+        obs_mean = self.mean
+        obs_std = np.sqrt(self.var)
+        return (inputs - obs_mean) / obs_std
+
+
+normalizer = Normalizer(8)
+
+def play_game(net, render=False):
     if render:
         env = gym.make("LunarLander-v2", render_mode="human")
     else:
@@ -15,64 +42,22 @@ def play_game(net : SimpleNEAgent, render=False):
     done = False
     rs = 0
     actions = []
-    while not done:
-        out = net(torch.tensor(obs, dtype=torch.float32))
+    e = 0
+    while (not done and e < 1000):
+        #print(net)
+        normalizer.observe(obs)
+        obs = normalizer.normalize(obs)
+        out = np.dot(obs, np.reshape(net, (8,4)))
         #print(out)
-        action = torch.argmax(out, 0).item()
+        action = np.random.choice(np.flatnonzero(out==out.max()))
         actions.append(float(action))
         obs, r, done, _, _ = env.step(action)
         rs += r
+        e += 1
     env.close()
-    net.reset()
-    return rs
-
-def get_es_nets(net: SimpleNEAgent):
-    es_pop = []
-    for x in range(es_size):
-        es_nodes = []
-        for n in net.nodes:
-            es_w = n.weights * (.5 * torch.randn(n.weights.shape))
-            es_nodes.append(SimpleNENode(n.activation, n.in_idxs, n.node_key, es_w, n.is_output))
-        es_pop.append(SimpleNEAgent(es_nodes, net.in_size, net.out_size, net.batch_size))
-    es_pop.append(net)
-    return es_pop
-
-def make_es_adjustments(net, scores, nets):
-    
-    return 
-
-def eval_pop(population):
-    fitness_list = []
-    print(len(population))
-    for net_idx in range(len(population)):
-        es_pop = get_es_nets(population[net_idx])
-        es_scores = []
-        for n in es_pop:
-            es_scores.append(play_game(n))
-        es_updated = 
-        fitness_list.append()
-    return torch.tensor(fitness_list, dtype=torch.float32)
+    return -rs
 
 if __name__ == '__main__':
-    pop_params = get_named_params("bernolli", 4)
-    pop = SimpleNEPopulation(8, 4, 200, 20, prob_params = pop_params)
-
-    best_fitness = 0
-
-    epoch_counter = 0
-    pop.init_population()
-    while best_fitness < 200:
-        fits = eval_pop(pop.population)
-        avg_fitness = fits.mean()
-        best_fitness = fits.max()
-        if epoch_counter % 5 == 0:
-            print(f"Epoch {epoch_counter} avg fitness: {avg_fitness} best fitness: {fits.max()}")
-        epoch_counter += 1
-        pop.evolve(fits)
-    print(f"solved in {epoch_counter} generations")
-    solved_net = pop.population[torch.argmax(fits).item()]
-    for x in range(5):
-        print(play_game(solved_net, True))
-    pickle.dump(solved_net,  open('./saved_models/lunar-lander-solver.pkl', 'wb'))
-    solved_net.print_model_details()
+    es = CMAEsPopulation(100, 32)
+    es.run_population(play_game, 1000)
 

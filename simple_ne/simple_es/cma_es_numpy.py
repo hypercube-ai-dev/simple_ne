@@ -18,6 +18,13 @@ class CMAEsPopulation:
         cov_mat = np.cov(diff, rowvar=False)
         self.sigma = (1 - lr_cov) * self.sigma + lr_cov * cov_mat
     
+    def ask():
+        raise("not implemented")
+    
+    def tell():
+        raise("not implemented")
+    
+    
     def run_population(self, obj_func, iterations=100):
         solved = False
         i = 0

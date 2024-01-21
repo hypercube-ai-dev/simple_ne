@@ -1,6 +1,6 @@
 import gymnasium as gym
 from simple_ne.preset_params import get_named_params
-from simple_es.cma_es_torch import CMAES
+from simple_ne.simple_es.cma_es_torch import CMAES
 import numpy as np
 import torch
 import pickle

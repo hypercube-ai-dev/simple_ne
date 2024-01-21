@@ -2,12 +2,12 @@ import torch
 import itertools
 
 class SubDivisionCube(object):
-    def __init__(self, dim, depth, center, width):
+    def __init__(self, center, depth, width):
         self.width = width
+        self.dim = len(center)
         self.center = torch.tensor(center)
-        self.dim = dim
         self.init_depth = depth
-        self.signs = torch.tensor(list(itertools.product([width,-width], repeat=dim)))
+        self.signs = torch.tensor(list(itertools.product([width,-width], repeat=self.dim)))
         self.tree = []
         self.sub_cube_size = (2**self.dim)
         self.build_tree()
@@ -20,7 +20,9 @@ class SubDivisionCube(object):
                 self.tree.append(self.center.repeat(self.sub_cube_size, 1) + (self.signs / (2*depth)))
             else:
                 print(self.tree[depth-2])
-                self.tree.append(torch.repeat_interleave(self.tree[depth-2],self.sub_cube_size,0) + (self.signs / (2*depth)).repeat(self.sub_cube_size,1))
+                # repeat depth minus one so that we match previous 
+                offsets = (self.signs / (2*depth)).repeat(self.sub_cube_size ** (depth - 1), 1)
+                self.tree.append(torch.repeat_interleave(self.tree[depth-2],self.sub_cube_size,0) + offsets)
         return
 
 

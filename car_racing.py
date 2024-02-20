@@ -27,9 +27,9 @@ def eval_pop(population):
     return torch.tensor(fitness_list, dtype=torch.float32)
 
 if __name__ == '__main__':
-    env = gym.make("CarRacing-v2")
+    env = gym.make("CarRacing-v1")
     obs,_ = env.reset()
-    print(obs.shape)
+    print(obs)
     '''pop_params = get_named_params("bernolli", 4)
     pop_params[0] = .5
     pop = SimpleNEPopulation(8, 4, 200, 100, prob_params = pop_params)

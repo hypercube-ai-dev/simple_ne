@@ -1,6 +1,3 @@
-import torch
-from torch import nn
-from random import random
 from .activations import activations
 from .attention_nets import AttentionNeNet, AttentionNeNode
 from .base_population import SimpleNEPopulation

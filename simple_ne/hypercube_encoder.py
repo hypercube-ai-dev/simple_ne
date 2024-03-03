@@ -1,4 +1,9 @@
 from sub_cube import SubDivisionCube
+import torch as pt
+
+# REMINDER: we will want float32 type outputs as that
+# is what pytorch uses as default
+
 
 class HypercubeEncoder():
 

@@ -1,11 +1,22 @@
 from torch import nn
 
-class EncoderLayer(nn.Module):
-    def __init__(self):
-        # Call the constructor of the parent class nn.Module to perform
-        # the necessary initialization
-        super().__init__()
 
-class FeedForward(nn.Module):
+class PhenotypeFactory():
+
     def __init__(self):
-        super().__init__()
+        self.phenotype_dict = {
+            "conv1d": self.to_conv1d,
+            "conv2d": self.to_conv2d  
+        }
+
+    def to_conv1d(weights):
+        shape = weights.shape
+        m = nn.Conv1d(shape[0], shape[1], shape[2], stride=1)
+        m.weight = weights
+        return m
+    
+    def to_conv2d(weights):
+        shape = weights.shape
+        m = nn.Conv2d(shape[0], shape[1], shape[2], stride=1)
+        m.weight = weights
+        return m

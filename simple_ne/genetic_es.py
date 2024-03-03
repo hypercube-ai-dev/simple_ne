@@ -55,7 +55,7 @@ class GeneticEsPop(SimpleNEPopulation):
     def evolve(self, fitness_func):
         #TODO parallize this so that each species runs es
         # in its own thread
-        for s in self.pop:
+        for s in self.num_species:
             weights = s.get_weights()
             es = CMAES(len(weights), self.species_size)
             es.mean = weights

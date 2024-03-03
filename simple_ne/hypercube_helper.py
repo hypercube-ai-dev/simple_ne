@@ -5,7 +5,7 @@ import torch as pt
 # is what pytorch uses as default
 
 
-class HypercubeEncoder():
+class HypercubeHelper():
 
     def __init__(
             self,

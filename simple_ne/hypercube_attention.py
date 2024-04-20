@@ -127,3 +127,11 @@ def query_torch_cppn_tensors(coords_in, coords_out, outgoing, cppn, max_weight=5
     inputs = get_nd_coord_inputs(coords_in, coords_out)
     activs = cppn(inputs)
     return activs
+
+# if batchsize is left at -1 it will treat the coords as a single full batch
+def get_nd_coord_inputs(in_coords, out_coords, batch_size=-1):
+    in_expanded = []
+    out_expanded = []
+
+    #it is expected the last dimension will be the coordinate space (1 for 1d coords, 2 for 2d etc)
+    for i in range(in_coords.shape[-1])

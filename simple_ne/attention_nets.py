@@ -93,7 +93,3 @@ class SimpleAttentionNeNode(torch.nn.Module):
         if weights == None:
             self.weights = torch.rand(in_size, out_size * 3)
         self.node_key = node_key
-
-class SimpleAttentionNeNet(torch.nn.Module):
-
-    def __init__(self, )

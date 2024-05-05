@@ -128,10 +128,21 @@ def query_torch_cppn_tensors(coords_in, coords_out, outgoing, cppn, max_weight=5
     activs = cppn(inputs)
     return activs
 
-# if batchsize is left at -1 it will treat the coords as a single full batch
-def get_nd_coord_inputs(in_coords, out_coords, batch_size=-1):
-    in_expanded = []
-    out_expanded = []
+def get_nd_coord_inputs(in_coords, out_coords, batch_size=None):
+    n_in = len(in_coords)
+    n_out = len(out_coords)
+    num_dimens = len(in_coords[1])
+    dimen_arrays = {}
 
-    #it is expected the last dimension will be the coordinate space (1 for 1d coords, 2 for 2d etc)
-    for i in range(in_coords.shape[-1])
+    if batch_size is not None:
+        in_coords = in_coords.unsqueeze(0).expand(batch_size, n_in, num_dimens)
+        out_coords = out_coords.unsqueeze(0).expand(batch_size, n_out, num_dimens)
+
+        for x in range(num_dimens):
+            dimen_arrays[str(x) + "_out"] = out_coords[:, :, x].unsqueeze(2).expand(batch_size, n_out, n_in) 
+            dimen_arrays[str(x) + "_in"] = in_coords[:, :, x].unsqueeze(1).expand(batch_size, n_out, n_in)
+    else:
+        for x in range(num_dimens):
+            dimen_arrays[str(x) + "_out"] = out_coords[:, x].unsqueeze(1).expand(n_out, n_in) 
+            dimen_arrays[str(x) + "_in"] = in_coords[:, x].unsqueeze(0).expand(n_out, n_in)
+    return dimen_arrays

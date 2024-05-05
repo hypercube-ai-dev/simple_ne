@@ -9,13 +9,11 @@ class HypercubeHelper():
 
     def __init__(
             self,
-            cppn,
             initial_depth,
             center,
             width
     ):
         self.cube = SubDivisionCube(center, initial_depth, width)
-        self.cppn = cppn
     
     def encode_input_layer(self, in_coords, net):
         return net(in_coords, self.cube.tree[0])

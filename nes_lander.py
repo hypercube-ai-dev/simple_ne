@@ -3,6 +3,7 @@ from simple_ne.es_nets.recurrent_nets import GruNet
 import numpy as np
 import torch
 from simple_ne.simple_es.elite_es import EliteEsPop
+from simple_ne.es_optimizers.nes import NESOptimizer
 import pickle
 
 def play_game(net, render=False):
@@ -28,7 +29,7 @@ def play_game(net, render=False):
 if __name__ == '__main__':
     net = GruNet(8, 4)
     pop_size = 50
-    popObj = EliteEsPop(net, sigma=.01, elite_cutoff=.1, size=pop_size)
+    popObj = NESOptimizer(net, play_game)
     with torch.no_grad():
         for generation in range(1000):
             pop = popObj.pop

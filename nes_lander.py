@@ -32,16 +32,10 @@ if __name__ == '__main__':
     popObj = NESOptimizer(net, play_game)
     with torch.no_grad():
         for generation in range(1000):
-            pop = popObj.pop
-            print(pop[0])
-            # Evaluate the samples (replace this with your own evaluation function)
-            evals_sorted = sorted([(s, play_game(net.set_params(pop[s]))) for s in range(pop.shape[0])], key= lambda x: x[1], reverse=True)
-            mean_score = np.mean([x[1] for x in evals_sorted[:popObj.cutoff]]) 
-            best_value = pop[evals_sorted[0][0]]
+            popObj.step()
             if evals_sorted[0][1] > 200:
                 break
             print(f"Generation {generation}, Best Value: {evals_sorted[0][0]} Mean Value: {mean_score}")
-            popObj.evolve_pop(torch.tensor([x[0] for x in evals_sorted[:popObj.cutoff]]))
         for x in range(5):
             print(play_game(net.set_params(best_value), True))
 

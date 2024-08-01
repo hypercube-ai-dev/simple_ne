@@ -33,9 +33,9 @@ if __name__ == '__main__':
     with torch.no_grad():
         for generation in range(1000):
             popObj.step()
-            if evals_sorted[0][1] > 200:
+            current = play_game(popObj.model)
+            if current > 200:
                 break
-            print(f"Generation {generation}, Best Value: {evals_sorted[0][0]} Mean Value: {mean_score}")
         for x in range(5):
-            print(play_game(net.set_params(best_value), True))
+            print(play_game(net.set_params(popObj.model), True))
 

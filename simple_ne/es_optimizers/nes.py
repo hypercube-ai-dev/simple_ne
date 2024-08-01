@@ -20,7 +20,7 @@ class NESOptimizer:
             rewards.append(reward)
         return np.array(rewards)
 
-    def _compute_fitness(self, x, fit_func):
+    def _compute_fitness(self):
         self.model.eval()
         with torch.no_grad():
             reward = self.fit_func(self.model)

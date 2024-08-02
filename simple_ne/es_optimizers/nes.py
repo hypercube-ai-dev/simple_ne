@@ -3,7 +3,7 @@ import torch.nn.utils as nn_utils
 import numpy as np
 
 class NESOptimizer:
-    def __init__(self, model, fit_func, sigma=0.1, population_size=50, lr=0.01):
+    def __init__(self, model, fit_func, sigma=0.01, population_size=50, lr=0.1):
         self.model = model
         self.sigma = sigma
         self.population_size = population_size
@@ -15,7 +15,7 @@ class NESOptimizer:
         rewards = []
         for perturbation in perturbations:
             perturbed_theta = self.theta + self.sigma * perturbation
-            nn_utils.vector_to_parameters(torch.tensor(perturbed_theta), self.model.parameters())
+            nn_utils.vector_to_parameters(torch.tensor(perturbed_theta, dtype=torch.float32), self.model.parameters())
             reward = self._compute_fitness()
             rewards.append(reward)
         return np.array(rewards)

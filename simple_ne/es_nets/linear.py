@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 
-class ConvGru(nn.Module):
+class LinearNet(nn.Module):
     def __init__(self, in_size, hidden_size, out_size):
         super().__init__()
         self.net = nn.Sequential(

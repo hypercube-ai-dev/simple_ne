@@ -1,5 +1,5 @@
 import gymnasium as gym
-from simple_ne.es_nets.recurrent_nets import GruNet
+from simple_ne.es_nets.linear import LinearNet
 import numpy as np
 import torch
 from simple_ne.simple_es.elite_es import EliteEsPop
@@ -17,7 +17,7 @@ def play_game(net, render=False):
     e = 0
     hidden = None
     while (not done and e < 1000):
-        out, hidden = net(torch.tensor(obs, dtype=torch.float32).unsqueeze(dim=0), hidden)
+        out = net(torch.tensor(obs, dtype=torch.float32).unsqueeze(dim=0))
         action = torch.argmax(out.squeeze(), 0).item()
         #actions.append(float(action))
         obs, r, done, _, _ = env.step(action)
@@ -27,13 +27,15 @@ def play_game(net, render=False):
     return rs
 
 if __name__ == '__main__':
-    net = GruNet(8, 4)
+    net = LinearNet(8, 16, 4)
     pop_size = 50
     popObj = NESOptimizer(net, play_game)
     with torch.no_grad():
         for generation in range(1000):
             popObj.step()
             current = play_game(popObj.model)
+            if generation % 10:
+                print("current score: ", current)
             if current > 200:
                 break
         for x in range(5):

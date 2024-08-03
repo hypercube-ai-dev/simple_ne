@@ -3,12 +3,14 @@ import torch.nn.utils as nn_utils
 import numpy as np
 
 class NESOptimizer:
-    def __init__(self, model, fit_func, sigma=0.01, population_size=50, lr=0.1):
+    def __init__(self, model, fit_func, sigma=0.1, population_size=500, lr=0.01):
         self.model = model
         self.sigma = sigma
         self.population_size = population_size
         self.lr = lr
-        self.theta = nn_utils.parameters_to_vector(model.parameters()).detach().numpy()
+        params = nn_utils.parameters_to_vector(model.parameters()).detach()
+        print(params.shape)
+        self.theta = np.zeros(params.numpy().shape)
         self.fit_func = fit_func
 
     def _evaluate(self, perturbations):
@@ -34,4 +36,4 @@ class NESOptimizer:
         A = (rewards - np.mean(rewards)) / np.std(rewards)
         gradient = np.dot(perturbations.T, A) / (self.population_size * self.sigma)
         self.theta += self.lr * gradient
-        nn_utils.vector_to_parameters(torch.tensor(self.theta), self.model.parameters())
+        nn_utils.vector_to_parameters(torch.tensor(self.theta, dtype=torch.float32), self.model.parameters())

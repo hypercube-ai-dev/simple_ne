@@ -3,7 +3,7 @@ import torch.nn.utils as nn_utils
 import numpy as np
 
 class NESOptimizer:
-    def __init__(self, model, fit_func, sigma=0.1, population_size=500, lr=0.01):
+    def __init__(self, model, fit_func, sigma=0.01, population_size=50, lr=0.01):
         self.model = model
         self.sigma = sigma
         self.population_size = population_size

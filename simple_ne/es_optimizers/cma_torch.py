@@ -1,4 +1,4 @@
-import cma
+import simple_ne.es_optimizers.cma_numpy as cma_numpy
 import gym
 import numpy as np
 import torch
@@ -12,7 +12,7 @@ class CMAESOptimizer:
         self.population_size = population_size
         self.max_iter = max_iter
         self.tolx = tolx
-        self.es = cma.CMAEvolutionStrategy(self.theta, self.sigma, {'popsize': self.population_size, 'maxiter': self.max_iter, 'tolx': self.tolx})
+        self.es = cma_numpy.CMAEvolutionStrategy(self.theta, self.sigma, {'popsize': self.population_size, 'maxiter': self.max_iter, 'tolx': self.tolx})
 
     def _evaluate(self, solutions, env, episodes=10):
         rewards = []

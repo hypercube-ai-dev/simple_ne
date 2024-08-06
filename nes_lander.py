@@ -27,7 +27,7 @@ def play_game(net, render=False):
     return rs
 
 if __name__ == '__main__':
-    net = LinearNet(8, 128, 4)
+    net = LinearNet(8, 32, 4)
     pop_size = 50
     popObj = NESOptimizer(net, play_game)
     with torch.no_grad():

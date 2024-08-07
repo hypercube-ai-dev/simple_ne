@@ -4,7 +4,6 @@ from simple_ne.es_optimizers.cma_torch import CMAESOptimizer
 from simple_ne.es_nets.linear import LinearNet
 # Initialize environment
 env = gym.make('LunarLander-v2')
-env.seed(seed)
 
 # Define policy network
 input_dim = env.observation_space.shape[0]

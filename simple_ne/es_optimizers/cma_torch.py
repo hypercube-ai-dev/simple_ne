@@ -15,7 +15,7 @@ class CMAESOptimizer:
         self.n_params = len(self.theta)
         self.mean = self.theta.clone()
         self.cov = torch.eye(self.n_params, device=self.device)
-        self.weights = torch.log((self.population_size + 1) / 2) - torch.log(torch.arange(1, self.population_size + 1, device=self.device))
+        self.weights = torch.log((torch.arange(1, self.population_size + 1, dtype=torch.float32, device=self.device) + 1) / 2) - torch.log(torch.arange(1, self.population_size + 1, dtype=torch.float32, device=self.device))
         self.weights /= self.weights.sum()
         self.mu_eff = 1 / torch.sum(self.weights ** 2)
         self.c1 = 2 / ((self.n_params + 1.3) ** 2 + self.mu_eff)

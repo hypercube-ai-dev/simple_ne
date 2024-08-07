@@ -2,7 +2,6 @@ import gymnasium as gym
 from simple_ne.es_nets.linear import LinearNet
 import numpy as np
 import torch
-from simple_ne.simple_es.elite_es import EliteEsPop
 from simple_ne.es_optimizers.nes import NESOptimizer
 import pickle
 

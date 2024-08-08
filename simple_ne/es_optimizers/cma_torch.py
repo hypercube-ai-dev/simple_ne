@@ -2,7 +2,7 @@ import torch
 import torch.nn.utils as nn_utils
 import numpy as np
 class CMAESOptimizer:
-    def __init__(self, model, sigma=0.5, population_size=50, max_iter=1000, tolx=1e-6, device='cpu'):
+    def __init__(self, model, compute_fitness, sigma=0.5, population_size=50, max_iter=1000, tolx=1e-6, device='cpu'):
         self.model = model
         self.device = device
         self.model.to(self.device)
@@ -11,6 +11,7 @@ class CMAESOptimizer:
         self.population_size = population_size
         self.max_iter = max_iter
         self.tolx = tolx
+        self.compute_fitness = compute_fitness
 
         self.n_params = len(self.theta)
         self.mean = self.theta.clone()
@@ -29,32 +30,20 @@ class CMAESOptimizer:
         self.C = self.B @ torch.diag(self.D ** 2) @ self.B.T
         self.eigen_eval = 0
 
-    def _evaluate(self, solutions, env, episodes=10):
+    def _evaluate(self, solutions):
         rewards = []
         for theta in solutions:
             nn_utils.vector_to_parameters(theta, self.model.parameters())
-            reward = self._compute_fitness(env, episodes)
+            reward = self._compute_fitness(self.model)
             rewards.append(-reward)  # CMA-ES minimizes, so we use negative rewards
         return rewards
 
-    def _compute_fitness(self, env, episodes):
+    def _compute_fitness(self, model, episodes = 10):
         self.model.eval()
         total_reward = 0
         for _ in range(episodes):
-            state = env.reset()
-            if not isinstance(state, np.ndarray) or state.size == 0:
-                continue
-            state = torch.tensor(state, dtype=torch.float32).unsqueeze(0).to(self.device)
-            done = False
-            while not done:
-                with torch.no_grad():
-                    action_probs = self.model(state)
-                    action = torch.argmax(action_probs, dim=1).item()
-                next_state, reward, done, _ = env.step(action)
-                if not isinstance(next_state, np.ndarray) or next_state.size == 0:
-                    break
-                state = torch.tensor(next_state, dtype=torch.float32).unsqueeze(0).to(self.device)
-                total_reward += reward
+            reward = self.compute_fitness(model)
+            total_reward += reward
         return total_reward / episodes
 
     def is_covariance_matrix_stable(self):

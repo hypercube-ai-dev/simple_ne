@@ -1,6 +1,6 @@
 import torch
 import torch.nn.utils as nn_utils
-
+import numpy as np
 class CMAESOptimizer:
     def __init__(self, model, sigma=0.5, population_size=50, max_iter=1000, tolx=1e-6, device='cpu'):
         self.model = model
@@ -42,12 +42,18 @@ class CMAESOptimizer:
         total_reward = 0
         for _ in range(episodes):
             state = env.reset()
+            if not isinstance(state, np.ndarray) or state.size == 0:
+                continue
+            state = torch.tensor(state, dtype=torch.float32).unsqueeze(0).to(self.device)
             done = False
             while not done:
-                state = torch.tensor(state, dtype=torch.float32).unsqueeze(0).to(self.device)
-                action_probs = self.model(state)
-                action = torch.argmax(action_probs, dim=1).item()
-                state, reward, done, _ = env.step(action)
+                with torch.no_grad():
+                    action_probs = self.model(state)
+                    action = torch.argmax(action_probs, dim=1).item()
+                next_state, reward, done, _ = env.step(action)
+                if not isinstance(next_state, np.ndarray) or next_state.size == 0:
+                    break
+                state = torch.tensor(next_state, dtype=torch.float32).unsqueeze(0).to(self.device)
                 total_reward += reward
         return total_reward / episodes
 

@@ -30,19 +30,19 @@ class CMAESOptimizer:
         self.C = self.B @ torch.diag(self.D ** 2) @ self.B.T
         self.eigen_eval = 0
 
-    def _evaluate(self, solutions):
+    def _evaluate(self, solutions, episodes):
         rewards = []
         for theta in solutions:
             nn_utils.vector_to_parameters(theta, self.model.parameters())
-            reward = self._compute_fitness(self.model)
+            reward = self._compute_fitness(episodes)
             rewards.append(-reward)  # CMA-ES minimizes, so we use negative rewards
         return rewards
 
-    def _compute_fitness(self, model, episodes = 10):
+    def _compute_fitness(self, episodes):
         self.model.eval()
         total_reward = 0
         for _ in range(episodes):
-            reward = self.compute_fitness(model)
+            reward = self.compute_fitness(self.model)
             total_reward += reward
         return total_reward / episodes
 
@@ -70,14 +70,15 @@ class CMAESOptimizer:
 
         # Check if the covariance matrix is stable or perform periodic update
         if not self.is_covariance_matrix_stable() or self.eigen_eval > 1 / (self.c1 + self.c_mu) / self.n_params / 10:
+            #print("covariance matrix unstable applying update")
             self.eigen_eval = 0
             self.C = torch.triu(self.C) + torch.triu(self.C, 1).T
             self.D, self.B = torch.linalg.eigh(self.C)
             self.D = torch.sqrt(self.D)
 
-    def step(self, env, episodes=10):
+    def step(self, episodes=10):
         solutions = self.sample_population()
-        fitnesses = self._evaluate(solutions, env, episodes)
+        fitnesses = self._evaluate(solutions, episodes)
         self.update_distribution(solutions, fitnesses)
 
     def sample_population(self):

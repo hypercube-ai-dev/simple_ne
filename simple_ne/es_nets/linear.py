@@ -13,3 +13,12 @@ class LinearNet(nn.Module):
 
     def forward(self, input):
         return self.net(input)
+    
+class FeedForward(nn.Module):
+    def __init__(self, in_size, out_size):
+        super().__init__()
+        self.linear = nn.Linear(in_size, out_size)
+
+    def forward(self, input):
+        return self.linear(input)
+    

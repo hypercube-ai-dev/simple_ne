@@ -1,10 +1,10 @@
 import torch
 from torch import nn
-import general_layers as gl
+import layers.general_layers as gl
 
 class FutureFM(torch.Module):
     def __init__(self, 
-                 in_size: int, 
+                 in_size: int,
                  patch_size: int,
                  out_size: int,
                  embed_size: int, 

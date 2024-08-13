@@ -1,10 +1,10 @@
 import gymnasium as gym
 import torch
-from simple_ne.es_optimizers.cma_torch import CMAESOptimizer
+from simple_ne.es_optimizers.pycma_torch import CMAESOptimizer
 from simple_ne.es_nets.linear import LinearNet
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
+#device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = 'cpu'
 def play_game(net, render=False):
     if render:
         env = gym.make("LunarLander-v2", render_mode="human")
@@ -16,7 +16,7 @@ def play_game(net, render=False):
     e = 0
     hidden = None
     while (not done and e < 1000):
-        out = net(torch.tensor(obs, dtype=torch.float32, device=device).unsqueeze(dim=0))
+        out = net(torch.tensor(obs, dtype=torch.float64, device=device).unsqueeze(dim=0))
         action = torch.argmax(out.squeeze(), 0).item()
         #actions.append(float(action))
         obs, r, done, _, _ = env.step(action)
@@ -34,7 +34,7 @@ output_dim = 4
 
 policy_network = LinearNet(input_dim, hidden_dim, output_dim)
 
-cmaes_optimizer = CMAESOptimizer(policy_network, play_game, sigma=0.5, population_size=50, max_iter=1000, tolx=1e-6, device=device)
+cmaes_optimizer = CMAESOptimizer(policy_network, play_game)
 
 # Training loop
 num_generations = 500

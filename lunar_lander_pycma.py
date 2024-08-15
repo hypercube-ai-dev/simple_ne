@@ -16,7 +16,7 @@ def play_game(net, render=False):
     e = 0
     hidden = None
     while (not done and e < 1000):
-        out = net(torch.tensor(obs, dtype=torch.float64, device=device).unsqueeze(dim=0))
+        out = net(torch.tensor(obs, dtype=torch.float32, device=device).unsqueeze(dim=0))
         action = torch.argmax(out.squeeze(), 0).item()
         #actions.append(float(action))
         obs, r, done, _, _ = env.step(action)
@@ -37,14 +37,14 @@ policy_network = FeedForward(input_dim, output_dim)
 cmaes_optimizer = CMAESOptimizer(policy_network, play_game)
 
 # Training loop
-num_generations = 500
+num_generations = 0
 for generation in range(num_generations):
     cmaes_optimizer.step(episodes=5)
     if (generation + 1) % 10 == 0:
         average_reward = -cmaes_optimizer._compute_fitness(10)
         print(f'Generation [{generation + 1}/{num_generations}], Average Reward: {average_reward:.4f}')
-        if average_reward > 200:
-            cmaes_optimizer.save_model(f'lunar_lander_custom_cmaes_model_gen_{generation + 1}.pth')
+        if average_reward < -200:
+            cmaes_optimizer.save_model(f'./saved_models/pycma_lunar/lunar_lander_custom_cmaes_model_gen_{generation + 1}.pth')
             break
-
+cmaes_optimizer.load_model("./saved_models/pycma_lunar/lunar_lander_custom_cmaes_model_gen_20.pth")
 play_game(cmaes_optimizer.model, True)

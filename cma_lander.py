@@ -1,7 +1,7 @@
 import gymnasium as gym
 import torch
 from simple_ne.es_optimizers.cma_torch import CMAESOptimizer
-from simple_ne.es_nets.linear import LinearNet
+from simple_ne.es_nets.linear import LinearNet, FeedForward
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -32,7 +32,7 @@ input_dim = 8
 hidden_dim = 8  # Example hidden layer size
 output_dim = 4
 
-policy_network = LinearNet(input_dim, hidden_dim, output_dim)
+policy_network = FeedForward(input_dim, output_dim)
 
 cmaes_optimizer = CMAESOptimizer(policy_network, play_game, sigma=0.5, population_size=50, max_iter=1000, tolx=1e-6, device=device)
 

@@ -26,11 +26,14 @@ def play_game(net : AttentionNeNet, render=False):
     #print(r)
     return rs
 
-def eval_pop(population):
+def eval_pop(population, episodes=1):
     fitness_list = []
     print(len(population))
     for net_idx in range(len(population)):
-        fitness_list.append(play_game(population[net_idx]))
+        fitness = []
+        for i in range(episodes):
+            fitness.append(play_game(population[net_idx]))
+        fitness_list.append((sum(fitness) / episodes))
     return torch.tensor(fitness_list, dtype=torch.float32)
 
 if __name__ == '__main__':
@@ -43,7 +46,7 @@ if __name__ == '__main__':
     epoch_counter = 0
 
     while best_fitness < 200:
-        fits = eval_pop(pop.population)
+        fits = eval_pop(pop.population, 5)
         avg_fitness = fits.mean()
         best_fitness = fits.max()
         #if epoch_counter % 5 == 0:

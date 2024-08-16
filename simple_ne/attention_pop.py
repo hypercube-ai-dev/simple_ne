@@ -19,7 +19,6 @@ class SimpleNEAttentionPopulation(SimpleNEPopulation):
             output_size,
             max_size,
             pop_size,
-            species,
             output_activation,
             prob_params,
             in_layer

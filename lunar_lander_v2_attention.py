@@ -37,16 +37,16 @@ def eval_pop(population, episodes=1):
     return torch.tensor(fitness_list, dtype=torch.float32)
 
 if __name__ == '__main__':
-    pop_params = get_named_params("bernolli", 4)
+    pop_params = get_named_params("random", 4)
     pop_params[0] = .5
-    pop = SimpleNEAttentionPopulation(8, 4, 200, 21, prob_params = pop_params, max_context_len=89)
+    pop = SimpleNEAttentionPopulation(8, 4, 16, 34, prob_params = pop_params, max_context_len=89)
     pop.init_population()
     best_fitness = 0
 
     epoch_counter = 0
 
     while best_fitness < 200:
-        fits = eval_pop(pop.population, 5)
+        fits = eval_pop(pop.population, 8)
         avg_fitness = fits.mean()
         best_fitness = fits.max()
         #if epoch_counter % 5 == 0:

@@ -9,19 +9,23 @@ from simple_ne.hypercube_attention import HyperAttention
 
 input_size = 8
 out_size = 4
-
+substrate = {
+    "input": [],
+    "output": [],
+    "hiddens": []
+}
 input_substrate = []
 output_substrate = []
 center_coord = [.5,.5,.5]
 coords_dim = len(center_coord)
 tree_depth = 3
-hypercube_helper = HypercubeHelper(tree_depth, center_coord, 1.0)
 params = {"head_depth": 1,
-            ""
             "max_weight": 5.0,
             "activation": "elu",
             "safe_baseline_depth": 3,
             "grad_steps": 4}
+
+attention_net_encoder = HyperAttention(substrate, params, 3, .5, .5)
 
 def play_game(net : TrasnformerClassifier, render=False):
     if render:
@@ -47,7 +51,9 @@ def eval_pop(population):
     fitness_list = []
     print(len(population))
     for net_idx in range(len(population)):
-        fitness_list.append(play_game(population[net_idx]))
+        ne_net = population[net_idx]
+        phenotype = attention_net_encoder.create_phenotype_network_nd(ne_net)
+        fitness_list.append(play_game())
     return torch.tensor(fitness_list, dtype=torch.float32)
 
 if __name__ == '__main__':

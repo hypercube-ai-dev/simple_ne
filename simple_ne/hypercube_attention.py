@@ -19,7 +19,7 @@ class HyperAttention:
             width, 
             sgd_phenotypes=False):
         self.substrate = substrate
-        self.num_heads = 2 ** self.substrate.dim # number of children for a single subdivision
+        self.num_heads = 2 ** len(center) # number of children for a single subdivision
         self.head_depth = params["head_depth"] # how many times to subdivide at each head
         self.seq_len = params["sequence_len"]
         self.params = {}
@@ -43,12 +43,12 @@ class HyperAttention:
         self.substrate = substrate
 
     # creates phenotype transformer
-    def create_phenotype_network_nd(self, coord_dictionary):
-        input_coords = coord_dictionary["input_coords"]
-        attn_coords = coord_dictionary["attn_coords"]
-        ff_coords = coord_dictionary["ff_coords"]
-        output_coords = coord_dictionary["output_coords"]
-        mlp_coords = coord_dictionary['mlp_coords']
+    def create_phenotype_network_nd(self, coord_dictionary, cppn):
+        input_coords = self.substrate["input_coords"]
+        attn_coords = self.substrate["attn_coords"]
+        ff_coords = self.substrate["ff_coords"]
+        output_coords = self.substrate["output_coords"]
+        mlp_coords = self.substrate['mlp_coords']
         attn_layers = [self.encode_attn_block(attn_coords[x], attn_coords[x], ff_coords[x]) for x in range(len(attn_coords))]
         classifier = self.endcode_output_net(attn_coords[-1], mlp_coords, output_coords)
         to_hidden_dim = query_torch_cppn_tensors(input_coords, attn_coords[0], True, self.cppn_in_net, self.max_weight).T

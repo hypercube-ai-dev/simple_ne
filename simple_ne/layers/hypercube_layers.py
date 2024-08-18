@@ -49,9 +49,14 @@ class TrasnformerClassifier(nn.Module):
     def forward(self, x, mask=None):
         x = torch.matmul(x, self.in_net)
         #with torch.no_grad():
+        # preserve feedforward output for residual connection
+        encode_out = None
         for l in self.layers:
-            x = l(x, mask=mask)
-        x = self.classifier(x)
+            if encode_out == None:
+                encode_out = l(x, mask=mask)
+            else:
+                encode_out = l(encode_out, mask=mask)
+        x = self.classifier(x + encode_out)
         x = F.softmax(x, -1) 
         return x
 

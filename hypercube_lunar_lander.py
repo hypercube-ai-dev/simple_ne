@@ -53,7 +53,7 @@ def eval_pop(population):
     for net_idx in range(len(population)):
         ne_net = population[net_idx]
         phenotype = attention_net_encoder.create_phenotype_network_nd(ne_net)
-        fitness_list.append(play_game())
+        fitness_list.append(play_game(phenotype))
     return torch.tensor(fitness_list, dtype=torch.float32)
 
 if __name__ == '__main__':

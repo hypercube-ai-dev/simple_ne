@@ -43,7 +43,7 @@ class HyperAttention:
         self.substrate = substrate
 
     # creates phenotype transformer
-    def create_phenotype_network_nd(self, coord_dictionary, cppn):
+    def create_phenotype_network_nd(self, cppn):
         input_coords = self.substrate["input_coords"]
         attn_coords = self.substrate["attn_coords"]
         ff_coords = self.substrate["ff_coords"]
@@ -51,19 +51,19 @@ class HyperAttention:
         mlp_coords = self.substrate['mlp_coords']
         attn_layers = [self.encode_attn_block(attn_coords[x], attn_coords[x], ff_coords[x]) for x in range(len(attn_coords))]
         classifier = self.endcode_output_net(attn_coords[-1], mlp_coords, output_coords)
-        to_hidden_dim = query_torch_cppn_tensors(input_coords, attn_coords[0], True, self.cppn_in_net, self.max_weight).T
+        to_hidden_dim = query_torch_cppn_tensors(input_coords, attn_coords[0], True, cppn, self.max_weight).T
         transformer = TrasnformerClassifier(attn_layers, classifier, to_hidden_dim, self.seq_len)
         return transformer
         
 
-    def endcode_output_net(self, in_coords, hidden_coords, out_coords):
+    def endcode_output_net(self, in_coords, hidden_coords, out_coords, cppn):
         ff_weights = {}
-        ff_weights["ff1"] = query_torch_cppn_tensors(in_coords, hidden_coords, True, self.cppn_class, self.max_weight).T
-        ff_weights["ff2"] = query_torch_cppn_tensors(hidden_coords, out_coords, True, self.cppn_class, self.max_weight).T
+        ff_weights["ff1"] = query_torch_cppn_tensors(in_coords, hidden_coords, True, cppn, self.max_weight).T
+        ff_weights["ff2"] = query_torch_cppn_tensors(hidden_coords, out_coords, True, cppn, self.max_weight).T
         return FeedForward(ff_weights)
 
 
-    def encode_attn_block(self, in_coords, attn_coords, ff_coords):
+    def encode_attn_block(self, in_coords, attn_coords, ff_coords, cppn):
         attn_weights = {}
         ff_weights = {}
         qw = query_torch_cppn_tensors(in_coords, attn_coords, True, self.cppn_q, self.max_weight).T

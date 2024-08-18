@@ -1,9 +1,11 @@
 import gymnasium as gym
 import torch
 from simple_ne.base_population import SimpleNEPopulation, SimpleNEAgent
+from simple_ne.layers.hypercube_layers import TrasnformerClassifier
 from simple_ne.preset_params import get_named_params
 from simple_ne.hypercube_helper import HypercubeHelper
 import pickle
+from simple_ne.hypercube_attention import HyperAttention
 
 input_size = 8
 out_size = 4
@@ -14,8 +16,14 @@ center_coord = [.5,.5,.5]
 coords_dim = len(center_coord)
 tree_depth = 3
 hypercube_helper = HypercubeHelper(tree_depth, center_coord, 1.0)
+params = {"head_depth": 1,
+            ""
+            "max_weight": 5.0,
+            "activation": "elu",
+            "safe_baseline_depth": 3,
+            "grad_steps": 4}
 
-def play_game(net : SimpleNEAgent, render=False):
+def play_game(net : TrasnformerClassifier, render=False):
     if render:
         env = gym.make("LunarLander-v2", render_mode="human")
     else:

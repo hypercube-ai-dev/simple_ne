@@ -3,28 +3,41 @@ import numpy as np
 import itertools
 from math import factorial
 import torch
+from layers.hypercube_layers import TrasnformerClassifier, FeedForward, EncoderLayer
+from simple_ne.sub_cube import SubDivisionCube
 #encodes a substrate of input and output coords with a cppn, adding 
 #hidden coords along the 
 
 class HyperAttention:
 
-    def __init__(self, substrate, cppn, params, sgd_phenotypes=False):
+    def __init__(
+            self, 
+            substrate, 
+            params,
+            initial_depth,
+            center,
+            width, 
+            sgd_phenotypes=False):
         self.substrate = substrate
-        self.cppn_q = cppn[0]
-        self.cppn_k = cppn[1]
-        self.cppn_v = cppn[2]
-        self.cppn_o = cppn[3]
-        self.cppn_ff = cppn[4]
-        self.cppn_class = cppn[5]
-        self.cppn_in_net = cppn[6]
         self.num_heads = 2 ** self.substrate.dim # number of children for a single subdivision
         self.head_depth = params["head_depth"] # how many times to subdivide at each head
         self.seq_len = params["sequence_len"]
         self.params = {}
-        self.activation_string = params["activation"]
         self.max_weight = params["max_weight"]
         self.lvl = 0
         self.sgd_phenotypes = sgd_phenotypes
+        self.cube = SubDivisionCube(center, initial_depth, width)
+    
+    def encode_input_layer(self, in_coords, net):
+        return net(in_coords, self.cube.tree[0])
+
+    # use this to encode weights between any two depths of the subdivision tree
+    # these can be the same depth if desired
+    def encode_hiddens(self, from_depth, to_depth, net):
+        return net(self.cube.tree[from_depth], self.cube.tree[to_depth])
+
+    def encode_output_layer(self, from_depth, out_coords, net):
+        return net(self.cube.tree[from_depth], out_coords)
 
     def reset_substrate(self, substrate):
         self.substrate = substrate
@@ -61,11 +74,6 @@ class HyperAttention:
         ff_weights["ff1"] = query_torch_cppn_tensors(attn_coords, ff_coords, True, self.cppn_ff, self.max_weight).T
         ff_weights["ff2"] = query_torch_cppn_tensors(ff_coords, attn_coords, True, self.cppn_ff, self.max_weight).T
         return EncoderLayer(attn_weights, ff_weights, qw.shape[1], self.num_heads)
-
-    def get_attention_layer(self, out_coords):
-        inputs = self.substrate.input_coordinates
-        self.encode_heads(inputs, out_coords)
-        return
 
 # a tree that subdivides n dimensional euclidean spaces
 class BatchednDimensionTree:

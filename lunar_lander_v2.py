@@ -24,11 +24,14 @@ def play_game(net : SimpleNEAgent, render=False):
     net.reset()
     return rs
 
-def eval_pop(population):
+def eval_pop(population, trials=5):
     fitness_list = []
     print(len(population))
     for net_idx in range(len(population)):
-        fitness_list.append(play_game(population[net_idx]))
+        nf = 0.0
+        for i in range(trials):
+            nf += play_game(population[net_idx])
+        fitness_list.append(nf / trials)
     return torch.tensor(fitness_list, dtype=torch.float32)
 
 if __name__ == '__main__':

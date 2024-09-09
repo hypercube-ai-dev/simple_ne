@@ -136,6 +136,11 @@ def query_torch_cppn_tensors(coords_in, coords_out, outgoing, cppn, max_weight=5
     activs = cppn(inputs)
     return activs
 
+def get_nd_coords_new(in_coords, out_coords):
+    in_expanded = in_coords.unsqueeze(1).expand(-1, out_coords.shape[0], -1).reshape(-1, in_coords.shape[-1])
+    out_expanded = out_coords.repeat(in_coords.shape[0],1)
+    return torch.cat((in_expanded, out_expanded), dim=1)
+
 def get_nd_coord_inputs(in_coords, out_coords, batch_size=None):
     n_in = len(in_coords)
     n_out = len(out_coords)

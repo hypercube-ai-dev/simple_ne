@@ -29,15 +29,18 @@ class HyperAttention:
         self.cube = SubDivisionCube(center, initial_depth, width)
     
     def encode_input_layer(self, in_coords, net):
-        return net(in_coords, self.cube.tree[0])
+        x = get_nd_coords_new(in_coords, self.cube.tree[0])
+        return net(x)
 
     # use this to encode weights between any two depths of the subdivision tree
     # these can be the same depth if desired
     def encode_hiddens(self, from_depth, to_depth, net):
-        return net(self.cube.tree[from_depth], self.cube.tree[to_depth])
+        x = get_nd_coords_new(self.cube.tree[from_depth], self.cube.tree[to_depth])
+        return net()
 
     def encode_output_layer(self, from_depth, out_coords, net):
-        return net(self.cube.tree[from_depth], out_coords)
+        x = get_nd_coords_new(self.cube.tree[from_depth], out_coords)
+        return net()
 
     def reset_substrate(self, substrate):
         self.substrate = substrate

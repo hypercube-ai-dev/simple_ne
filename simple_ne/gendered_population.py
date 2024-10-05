@@ -35,14 +35,14 @@ class GenderedPopulation():
             prob_params=prob_params,
             in_layer=in_layer)
         
-        def evaluate(inputs, female_eval, male_eval):
-            male_outs = [male_eval(inputs, m_net) for m_net in self.male_pop.population]
-            female_outs = []
-            for ix, m_out in enumerate(male_outs):
-                female_outs[ix] = [female_eval(inputs, m_out, f_net) for f_net in self.female_pop.population]
-            return male_outs
+    def evaluate(self, inputs, female_eval, male_eval):
+        male_outs = [male_eval(inputs, m_net) for m_net in self.male_pop.population]
+        female_outs = []
+        for ix, m_out in enumerate(male_outs):
+            female_outs[ix] = [female_eval(inputs, m_out, f_net) for f_net in self.female_pop.population]
+        return male_outs
 
-        def evolve(fitness_list):
-            self.male_pop.evolve(torch.mean(fitness_list, 1))
-            self.female_pop.evolve(torch.mean(fitness_list, 0))
+    def evolve(self, fitness_list):
+        self.male_pop.evolve(torch.mean(fitness_list, 1))
+        self.female_pop.evolve(torch.mean(fitness_list, 0))
             

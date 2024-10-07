@@ -1,4 +1,6 @@
+import copy
 from genes import ConnectionGene, NodeGene
+from genome import Genome
 import random
 import numpy as np
 

@@ -59,7 +59,16 @@ def eval_pop(population):
 if __name__ == '__main__':
     pop_params = get_named_params("bernolli", 4)
     pop = SimpleNEPopulation(8, 4, 200, 20, prob_params = pop_params)
-
+    substrate["input"] = [
+        (-1.0, 1.0, 1.0),
+        (1.0, 1.0, 1.0),
+        (1.0, 1.0, -.5),
+        (1.0, 1.0, .5),
+        (-1.0, 1.0, -.5)
+        (-1.0, 1.0, .5)
+        (.5, .5, .5),
+        (-.5, -.5, -.5)
+    ]
     best_fitness = 0
 
     epoch_counter = 0

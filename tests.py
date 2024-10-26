@@ -1,6 +1,7 @@
 from simple_ne.simple_ne import SimpleNEAgent, SimpleNENode, SimpleNEPopulation
 from simple_ne.sub_cube import SubDivisionCube
 import torch
+import simple_ne.hypercube_helper
 
 cube = SubDivisionCube((0.0,0.0,0.0), 2, .5)
 bp = SimpleNEPopulation(2, 2, 100, 10)
@@ -16,7 +17,8 @@ def tree_test():
     print(cube.tree[0].shape)
     print(len(cube.tree[0][1]))
 
-def test_encode_input_layer(num_inputs=8):
+def test_encode_input_layer(num_inputs=2):
+    test_genome = bp.create_genome()
     input_substrate = [[.5, .5, .5/x] for x in range(num_inputs)]
-    print(input_substrate)
+    
 tree_test()

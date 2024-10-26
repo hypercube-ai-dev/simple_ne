@@ -19,6 +19,7 @@ class PhenotypeLayerFactory():
     
     def to_conv2d(weights):
         shape = weights.shape
+        assert len(shape) == 3
         m = nn.Conv2d(shape[0], shape[1], shape[2], stride=1)
         m.weight = weights
         return m

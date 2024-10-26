@@ -4,7 +4,7 @@ from random import random
 from .activations import activations
 
 class SimpleNENode(object):
-    def __init__(self, activation, in_idxs, key, weights=None, is_output=False):
+    def __init__(self, activation, in_idxs, key, weights=None, is_output=False, agg_func=None):
         self.activation = activation
         if weights == None:
             self.weights = torch.randn(len(in_idxs))
@@ -13,12 +13,15 @@ class SimpleNENode(object):
         self.in_idxs = in_idxs
         self.node_key = key
         self.is_output = is_output
+        self.agg = agg_func
 
     def activate(self, inputs, batched=False):
         if batched == True:
             inputs = torch.index_select(inputs, 1, self.in_idxs)
         else:
             inputs = torch.index_select(inputs, 0, self.in_idxs)
+        if self.agg != None:
+            inputs = self.agg(inputs)
         return self.activation(torch.matmul(self.weights, inputs))
     
     def add_connection(self, key):

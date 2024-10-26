@@ -1,7 +1,9 @@
 from simple_ne.simple_ne import SimpleNEAgent, SimpleNENode, SimpleNEPopulation
 from simple_ne.sub_cube import SubDivisionCube
 import torch
-import simple_ne.hypercube_helper
+from simple_ne.hypercube_helper import HypercubeHelper
+import simple_ne.hypercube_attention
+
 
 cube = SubDivisionCube((0.0,0.0,0.0), 2, .5)
 bp = SimpleNEPopulation(2, 2, 100, 10)

@@ -23,4 +23,5 @@ def test_encode_input_layer(num_inputs=2):
     test_genome = bp.create_genome()
     input_substrate = [[.5, .5, .5/x] for x in range(num_inputs)]
     
+
 tree_test()

@@ -2,6 +2,13 @@ import torch
 import torch.nn.functional as F
 import math
 
+class AttentionSpecimen(torch.nn.Module):
+    def __init__(self, size, ctx_len):
+        super().__init__()
+        self.size = size
+        self.attention = torch.full([size, size], float('-inf'))
+
+
 def scaled_dot_product(q, k, v, mask=None):
     d_k = q.size()[-1]
     attn_logits = torch.matmul(q, k.transpose(-2, -1))

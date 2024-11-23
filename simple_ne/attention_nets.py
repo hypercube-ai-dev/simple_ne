@@ -2,11 +2,6 @@ import torch
 import torch.nn.functional as F
 import math
 
-class AttentionSpecimen(torch.nn.Module):
-    def __init__(self, size, ctx_len):
-        super().__init__()
-        self.size = size
-        self.attention = torch.full([size, size], float('-inf'))
 
 
 def scaled_dot_product(q, k, v, mask=None):
@@ -18,6 +13,12 @@ def scaled_dot_product(q, k, v, mask=None):
     attention = F.softmax(attn_logits, dim=-1)
     values = torch.matmul(attention, v)
     return values, attention
+
+class AttentionGenome(torch.nn.Module):
+    def __init__(self, size, ctx_len):
+        super().__init__()
+        self.size = size
+        self.attention = torch.full([size, size], float('-inf'))
 
 class AttentionNeNode(torch.nn.Module):
 

@@ -16,7 +16,8 @@ class HypercubeHelper():
         self.cube = SubDivisionCube(center, initial_depth, width)
     
     def encode_input_layer(self, in_coords, net):
-        return net(in_coords, self.cube.tree[0])
+        merged = get_nd_coord_inputs_as_tensor(in_coords, self.cube.tree[0])
+        return net()
 
     # use this to encode weights between any two depths of the subdivision tree
     # these can be the same depth if desired
@@ -25,3 +26,9 @@ class HypercubeHelper():
 
     def encode_output_layer(self, from_depth, out_coords, net):
         return net(self.cube.tree[from_depth], out_coords)
+    
+def get_nd_coord_inputs_as_tensor(in_coords : torch.tensor, out_coords : torch.tensor):
+    in_expanded = in_coords.unsqueeze(1)
+    out_expanded = out_coords.unsqueeze(0)
+    combined = torch.cat((in_expanded.expand(-1, out_coords.shape[0], -1), out_expanded.expand(in_coords.shape[0], -1, -1)), dim=2)
+    return combined.view(-1, in_coords.shape[-1] * 2)

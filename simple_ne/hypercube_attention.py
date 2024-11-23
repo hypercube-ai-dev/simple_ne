@@ -3,7 +3,7 @@ import numpy as np
 import itertools
 from math import factorial
 import torch
-from layers.hypercube_layers import TrasnformerClassifier, FeedForward, EncoderLayer
+from .layers.hypercube_layers import TrasnformerClassifier, FeedForward, EncoderLayer
 from simple_ne.sub_cube import SubDivisionCube
 #encodes a substrate of input and output coords with a cppn, adding 
 #hidden coords along the 
@@ -135,7 +135,7 @@ class nd_Connection:
         return hash(self.coords + (self.weight,))
 
 def query_torch_cppn_tensors(coords_in, coords_out, outgoing, cppn, max_weight=5.0):
-    inputs = get_nd_coord_inputs(coords_in, coords_out)
+    inputs = get_nd_coord_inputs_as_tensor(coords_in, coords_out)
     activs = cppn(inputs)
     return activs
 
@@ -144,7 +144,13 @@ def get_nd_coords_new(in_coords, out_coords):
     out_expanded = out_coords.repeat(in_coords.shape[0],1)
     return torch.cat((in_expanded, out_expanded), dim=1)
 
-def get_nd_coord_inputs(in_coords, out_coords, batch_size=None):
+def get_nd_coord_inputs_as_tensor(in_coords : torch.tensor, out_coords : torch.tensor):
+    in_expanded = in_coords.unsqueeze(1)
+    out_expanded = out_coords.unsqueeze(0)
+    combined = torch.cat((in_expanded.expand(-1, out_coords.shape[0], -1), out_expanded.expand(in_coords.shape[0], -1, -1)), dim=2)
+    return combined.view(-1, in_coords.shape[-1] * 2)
+
+def get_nd_coord_inputs_as_dict(in_coords, out_coords, batch_size=None):
     n_in = len(in_coords)
     n_out = len(out_coords)
     num_dimens = len(in_coords[1])

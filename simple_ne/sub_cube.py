@@ -19,7 +19,6 @@ class SubDivisionCube(object):
             if depth == 1:
                 self.tree.append(self.center.repeat(self.sub_cube_size, 1) + (self.signs / (2*depth)))
             else:
-                print(self.tree[depth-2])
                 # repeat depth minus one so that we match previous 
                 offsets = (self.signs / (2*depth)).repeat(self.sub_cube_size ** (depth - 1), 1)
                 self.tree.append(torch.repeat_interleave(self.tree[depth-2],self.sub_cube_size,0) + offsets)

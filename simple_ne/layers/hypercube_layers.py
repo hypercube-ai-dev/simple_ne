@@ -3,7 +3,6 @@ from torch import nn
 import torch.nn.functional as F
 import numpy as np
 import math
-from .activations import str_to_activation
 
 
 def scaled_dot_product(q, k, v, mask=None):

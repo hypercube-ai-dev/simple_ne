@@ -23,22 +23,20 @@ class SimpleNEAgent(nn.Module):
     def __init__(self, nodes, input_size, output_size):
         super().__init__()
         self.nodes = nodes
+        self.num_nodes = len(nodes)
         self.in_size = input_size
         self.out_size = output_size
-        self.reset()
         return
-
-    def reset(self, batch_size=0):
-        # this is to track the value at each node
-        if batch_size == 0:
-            self.activs = torch.zeros(self.in_size + len(self.nodes)+1)
-        else:
-            self.activs = torch.zeros(batch_size, self.in_size + len(self.nodes)+1)
+    
     # nodes are added in order and have a
     # probability of connecting to existing nodes
     # each node will need the output of nodes that come before it
     def forward(self, x, mask=None):
-        if len(x.shape) > 1:
+        self.activs = torch.zeros(x.shape[0], x.shape[1] + self.num_nodes)
+        print(len(x.shape))
+        if len(x.shape) == 1:
+            print(self.activs.shape)
+            print(x.shape)
             self.activs[:x.shape[0]] = x
             out = []
             for ix,n in enumerate(self.nodes):

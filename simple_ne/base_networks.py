@@ -22,33 +22,30 @@ class SimpleNENode(object):
             inputs = torch.index_select(inputs, 0, self.in_idxs)
         if self.agg != None:
             inputs = self.agg(inputs)
-        return self.activation(torch.matmul(self.weights, inputs))
+        return self.activation(torch.matmul(inputs, self.weights))
     
     def add_connection(self, key):
         torch.cat((self.in_idxs, torch.tensor([key])))
         torch.cat((self.weights, torch.randn(1)))
 
 class SimpleNEAgent(nn.Module):
-    def __init__(self, nodes: list[SimpleNENode], input_size, output_size, batch_size = 0):
+    def __init__(self, nodes: list[SimpleNENode], input_size, output_size):
         super().__init__()
         self.nodes = nodes
+        self.num_nodes = len(nodes)
         self.in_size = input_size
         self.out_size = output_size
-        self.batch_size = batch_size
-        self.reset()
         return
 
-    def reset(self):
-        # this is to track the value at each node
-        if self.batch_size == 0:
-            self.activs = torch.zeros(self.in_size + len(self.nodes)+1)
-        else:
-            self.activs = torch.zeros(self.batch_size, self.in_size + len(self.nodes)+1)
     # nodes are added in order and have a
     # probability of connecting to existing nodes
     # each node will need the output of nodes that come before it
     def forward(self, x, mask=None):
-        if self.batch_size == 0:
+        self.activs = torch.zeros(x.shape[0], x.shape[1] + self.num_nodes)
+        print(len(x.shape))
+        if len(x.shape) == 1:
+            print(self.activs.shape)
+            print(x.shape)
             self.activs[:x.shape[0]] = x
             out = []
             for ix,n in enumerate(self.nodes):
@@ -64,7 +61,10 @@ class SimpleNEAgent(nn.Module):
                 self.activs[:,x.shape[1]+ix] = n_out
                 if n.is_output == True:
                     out.append(n_out)
-        return torch.tensor(out)
+        if self.out_size > 1:
+            return torch.tensor(out)
+        else:
+            return out[0]
     
     def get_weights(self, flattened=False):
         if not flattened:
@@ -73,10 +73,10 @@ class SimpleNEAgent(nn.Module):
             return self.__get_weights_flattened()
 
     def __get_weights_flattened(self):
-        weights_list = torch.tensor()
+        weights_list = []
         for n in self.nodes:
             weights_list += n.weights
-        return weights_list
+        return torch.tensor(weights_list)
         
     def __get_weights_as_dict(self):
         weight_dict = {}

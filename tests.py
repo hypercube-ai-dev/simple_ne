@@ -1,4 +1,4 @@
-from simple_ne.simple_ne import SimpleNEAgent, SimpleNENode, SimpleNEPopulation
+from simple_ne.base_population import SimpleNEPopulation
 from simple_ne.sub_cube import SubDivisionCube
 import torch
 import simple_ne.hypercube_attention as ha

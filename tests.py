@@ -20,12 +20,15 @@ def tree_test():
 def test_encode_input_layer(num_inputs=20):
     cube = SubDivisionCube((0.5,0.5,0.5), 2, .5)
     # input six for 3d substrate, out one for weight
-    bp = SimpleNEPopulation(6, 1, 100, 10)
+    bp = SimpleNEPopulation(6, 3, 100, 10)
     test_genome = bp.create_genome()
     input_substrate = torch.tensor([[1.0, 1.0, 1.0/x] for x in range(1,num_inputs+1)])
     print(input_substrate)
     merged = ha.get_nd_coord_inputs_as_tensor(input_substrate, cube.tree[0])
     out = test_genome(merged)
-    print(out)
+    print(out.shape)
+
+def test_hypercube_attention_ff(num_inputs=20):
+    return
     
-test_encode_input_layer()
+test_encode_input_layer(900)

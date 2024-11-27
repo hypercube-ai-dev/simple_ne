@@ -62,7 +62,7 @@ class SimpleNEAgent(nn.Module):
                 if n.is_output == True:
                     out.append(n_out)
         if self.out_size > 1:
-            return torch.tensor(out)
+            return torch.stack(out)
         else:
             return out[0]
     

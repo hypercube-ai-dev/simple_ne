@@ -34,8 +34,13 @@ class HyperAttention:
 
     # use this to encode weights between any two depths of the subdivision tree
     # these can be the same depth if desired
-    def encode_hiddens(self, from_depth, to_depth, net):
-        x = get_nd_coords_new(self.cube.tree[from_depth], self.cube.tree[to_depth])
+    def encode_by_depth(self, from_depth, to_depth, net, to_indices = []):
+        to_coords = None
+        if (len(to_indices) > 0):
+            to_coords = torch.index_select(self.cube.tree[to_depth], 0, to_indices)
+        else:
+            to_coords = self.cube.tree[to_depth]
+        x = get_nd_coords_new(self.cube.tree[from_depth], to_coords)
         return net(x)
 
     def encode_output_layer(self, from_depth, out_coords, net):

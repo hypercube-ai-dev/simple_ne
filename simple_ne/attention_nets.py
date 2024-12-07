@@ -27,7 +27,6 @@ class AttentionNeNode(torch.nn.Module):
         self.in_idxs = in_keys
         # qkv so multiply by three
         self.weights = torch.randn(len(in_keys), 3)
-        #self.o_proj = torch.randn(len(in_keys), 1)
         self.activation = activation
         self.key = node_key
         self.is_output = is_output

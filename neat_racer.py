@@ -12,7 +12,8 @@ def play_game(net):
     return 0.0
 
 def eval_genomes_parallel(genomes, config, callback):
-    
+    raise NotImplementedError
+
 def eval_genomes(genomes, config):
     fitness_list = []
     for g in genomes:
@@ -61,5 +62,5 @@ if __name__ == '__main__':
     # here so that the script will run successfully regardless of the
     # current working directory.
     local_dir = os.path.dirname(__file__)
-    config_path = os.path.join(local_dir, 'config-feedforward')
+    config_path = os.path.join(local_dir, './configs/neat_base.cfg')
     run(config_path)

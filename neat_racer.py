@@ -1,14 +1,13 @@
 """
-2-input XOR example -- this is most likely the simplest possible example.
+Very basic neat-python training script for .
 """
-
+import gymnasium as gym
 import os
-
 import neat
-import visualize
 
 
 def play_game(net):
+    env = gym.make("CarRacing-v2")
     return 0.0
 
 def eval_genomes_parallel(genomes, config, callback):
@@ -37,23 +36,7 @@ def run(config_file):
     # Run for up to 300 generations.
     winner = p.run(eval_genomes, 300)
 
-    # Display the winning genome.
-    print('\nBest genome:\n{!s}'.format(winner))
-
-    # Show output of the most fit genome against training data.
-    print('\nOutput:')
-    winner_net = neat.nn.FeedForwardNetwork.create(winner, config)
-    for xi, xo in zip(xor_inputs, xor_outputs):
-        output = winner_net.activate(xi)
-        print("input {!r}, expected output {!r}, got {!r}".format(xi, xo, output))
-
-    node_names = {-1: 'A', -2: 'B', 0: 'A XOR B'}
-    visualize.draw_net(config, winner, True, node_names=node_names)
-    visualize.draw_net(config, winner, True, node_names=node_names, prune_unused=True)
-    visualize.plot_stats(stats, ylog=False, view=True)
-    visualize.plot_species(stats, view=True)
-
-    p = neat.Checkpointer.restore_checkpoint('neat-checkpoint-4')
+    p = neat.Checkpointer.restore_checkpoint('neat-car-racing')
     p.run(eval_genomes, 10)
 
 

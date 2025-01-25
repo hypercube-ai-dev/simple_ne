@@ -1,14 +1,29 @@
 """
 Very basic neat-python training script for .
 """
-import gymnasium as gym
+from gymnasium.envs.box2d import CarRacing
 import os
 import neat
+import neat.nn.recurrent
+import numpy as np
 
 
-def play_game(net):
-    env = gym.make("CarRacing-v2")
-    return 0.0
+def play_game(net, render=False):
+    env = CarRacing(continuous=False)
+    obs,_ = env.reset()
+    print(obs.shape)
+    done = False
+    rs = 0
+    actions = []
+    while not done:
+        out = []
+        for x in range(obs.shape[0]):
+            out = net.activate(obs[x])
+        action = np.argmax(out)
+        actions.append(float(action))
+        obs, r, done, _, _ = env.step(action)
+        rs += r
+    return rs
 
 def eval_genomes_parallel(genomes, config, callback):
     raise NotImplementedError
@@ -16,7 +31,9 @@ def eval_genomes_parallel(genomes, config, callback):
 def eval_genomes(genomes, config):
     fitness_list = []
     for g in genomes:
-        reward = play_game(g)
+        net = neat.nn.recurrent.RecurrentNetwork.create(g, config)
+        g.fitness = play_game(g)
+
 
 def run(config_file):
     # Load configuration.
@@ -34,7 +51,7 @@ def run(config_file):
     p.add_reporter(neat.Checkpointer(5))
 
     # Run for up to 300 generations.
-    winner = p.run(eval_genomes, 300)
+    winner = p.run(eval_genomes, 30)
 
     p = neat.Checkpointer.restore_checkpoint('neat-car-racing')
     p.run(eval_genomes, 10)

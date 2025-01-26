@@ -6,9 +6,10 @@ import os
 import neat
 import neat.nn.recurrent
 import numpy as np
-
+from gymnasium.wrappers import GrayScaleObservation 
 
 def play_game(net, render=False):
+    # convert to grayscale
     env = CarRacing(continuous=False)
     obs,_ = env.reset()
     print(obs.shape)
@@ -31,8 +32,8 @@ def eval_genomes_parallel(genomes, config, callback):
 def eval_genomes(genomes, config):
     fitness_list = []
     for g in genomes:
-        net = neat.nn.recurrent.RecurrentNetwork.create(g, config)
-        g.fitness = play_game(g)
+        net = neat.nn.recurrent.RecurrentNetwork.create(g[1], config)
+        g.fitness = play_game(net)
 
 
 def run(config_file):
